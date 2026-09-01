@@ -318,7 +318,9 @@ function enter(){
   const p = el('g-pass').value.trim();
   if (!p){ el('g-err').textContent = 'Введите пароль'; el('g-pass').focus(); return; }
   if (p !== (ROLE === 'crd' ? PASS_CRD : PASS_ADM)){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
-  location.href = ROLE === 'crd' ? 'koordinator.html' : PAGES[el('g-city').value];
+  const target = ROLE === 'crd' ? 'koordinator.html' : PAGES[el('g-city').value];
+  try { location.href = target; } catch (err) {}
+  setTimeout(() => { el('g-err').textContent = 'Страница ' + target + ' не открылась — откройте файл вручную'; }, 1500);
 }
 el('g-go').onclick = enter;
 el('g-pass').onkeydown = e => { if (e.key === 'Enter') enter(); };
