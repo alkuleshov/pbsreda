@@ -25,6 +25,25 @@
   --red-pale:#FBEDEB;
   --r:3px;
 }
+/* фиолетово-розовая тема кабинета координатора */
+body.crd{
+  --green:#8B2FC7;
+  --green-dark:#6E1FA3;
+  --green-pale:#F7ECFC;
+  --green-soft:#EFA8CE;
+  --pink:#D42A87;
+  --pink-dark:#A81C68;
+}
+body.crd .s-sent .st{color:var(--pink-dark);border-color:var(--green-soft);background:#FDF0F7}
+body.crd .num.sent b{color:var(--pink)}
+body.crd .role{border-color:var(--green);color:var(--green-dark);background:var(--green-pale)}
+body.crd .tabs button[aria-selected="true"]{background:var(--green);color:#fff}
+body.crd .gate-card{border-color:var(--green)}
+body.crd .sec-h{border-bottom-color:var(--green)}
+body.crd .chip[aria-pressed="true"]{border-color:var(--green);color:var(--green-dark);box-shadow:inset 0 0 0 1px var(--green)}
+body.crd .toast{border-color:var(--green)}
+body.crd .msg.back{border-left-color:var(--pink)}
+
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{font-family:'Golos Text',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);
@@ -302,7 +321,7 @@ body.locked{overflow:hidden}
       </div>
       <div class="hero-nums">
         <div class="num ok"><b id="n-ok">0</b><i>принято</i></div>
-        <div class="num"><b id="n-sent">0</b><i>на проверке</i></div>
+        <div class="num sent"><b id="n-sent">0</b><i>на проверке</i></div>
         <div class="num bad"><b id="n-no">0</b><i>не предоставят</i></div>
         <div class="num"><b id="n-left">48</b><i>осталось</i></div>
       </div>
@@ -654,6 +673,7 @@ function setTab(r){
     ? 'Кабинет бюро: проверка присланного, подтверждение приёма и сроки по всем территориям.'
     : 'Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт координатор бюро.';
   el('g-err').textContent = '';
+  document.body.classList.toggle('crd', r === 'crd');
 }
 el('tab-adm').onclick = () => setTab('adm');
 el('tab-crd').onclick = () => setTab('crd');
@@ -666,6 +686,7 @@ function enter(){
   items = STATE[CITY];
   el('city').value = CITY;
   el('hero-city').textContent = CITY;
+  document.body.classList.toggle('crd', ROLE === 'crd');
   el('role-tag').textContent = ROLE === 'crd' ? 'Координатор бюро' : 'Администрация';
   el('hero-sub').innerHTML = ROLE === 'crd'
     ? 'Кулиджанова Нана · проверка и приём документов по всем территориям'
