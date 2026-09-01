@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
+  color-scheme:light;
   --green:#11A138;
   --green-dark:#0C7C2B;
   --green-pale:#EAF6ED;
@@ -45,10 +46,10 @@ body.crd .toast{border-color:var(--green)}
 body.crd .msg.back{border-left-color:var(--pink)}
 
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
+html,body{margin:0;padding:0;background:#fff}
 body{font-family:'Golos Text',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);
   background:var(--paper);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
-button,input,textarea,select{font:inherit;color:inherit}
+button,input,textarea,select{font:inherit;color:var(--ink);background:#fff}
 a{color:var(--green-dark)}
 body.locked{overflow:hidden}
 
@@ -236,6 +237,7 @@ body.locked{overflow:hidden}
   font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:40;max-width:80vw}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{padding:40px 12px;color:var(--ink-2);font-size:14px}
+.page-foot{margin:40px 0 0;padding-top:18px;border-top:1px solid var(--line-2);font-size:12.5px;color:var(--ink-3)}
 
 @media (max-width:900px){
   .gate-cols{grid-template-columns:1fr;gap:36px;margin-top:34px}
@@ -282,6 +284,13 @@ body.locked{overflow:hidden}
             <option>Город 1</option>
             <option>Город 2</option>
             <option>Город 3</option>
+            <option>Город 4</option>
+            <option>Город 5</option>
+            <option>Город 6</option>
+            <option>Город 7</option>
+            <option>Город 8</option>
+            <option>Город 9</option>
+            <option>Город 10</option>
           </select>
         </div>
         <div class="f">
@@ -311,6 +320,13 @@ body.locked{overflow:hidden}
           <option>Город 1</option>
           <option>Город 2</option>
           <option>Город 3</option>
+          <option disabled>Город 4 — профайл не добавлен</option>
+          <option disabled>Город 5 — профайл не добавлен</option>
+          <option disabled>Город 6 — профайл не добавлен</option>
+          <option disabled>Город 7 — профайл не добавлен</option>
+          <option disabled>Город 8 — профайл не добавлен</option>
+          <option disabled>Город 9 — профайл не добавлен</option>
+          <option disabled>Город 10 — профайл не добавлен</option>
         </select>
       </div>
       <button class="btn" id="logout">Выйти из профиля</button>
@@ -355,6 +371,7 @@ body.locked{overflow:hidden}
     <div class="bar" id="chips"></div>
     <div id="list"></div>
     <p class="empty" id="empty" hidden>По этому фильтру запросов нет.</p>
+      <p class="page-foot">© 2026 Проектное бюро «Среда». Все права защищены.</p>
   </main>
 </div>
 
@@ -409,7 +426,7 @@ CITIES.forEach(c => {
   }))));
 });
 const PAGE = {role:'adm', city:'Город 2'};
-let CITY = PAGE.city, ROLE = PAGE.role, items = STATE[CITY], filter = 'all';
+let CITY = PAGE.city, ROLE = PAGE.role, items = STATE[CITY], filter = 'all', query = '';
 
 /* шаблоны и примеры — файлы подгрузит координатор */
 const TPL = [
@@ -454,7 +471,7 @@ function chips(){
        ['no','Не предоставят ' + c.no],['ok','Принято ' + c.ok]];
   el('chips').innerHTML = set.map(([f, t]) =>
     '<button class="chip" data-f="' + f + '" aria-pressed="' + (filter === f) + '">' + t + '</button>').join('') +
-    '<div class="search"><input id="q" type="search" placeholder="Поиск по запросам" aria-label="Поиск"></div>';
+    '<div class="search"><input id="q" type="search" value="' + esc(query) + '" placeholder="Поиск по запросам" aria-label="Поиск"></div>';
 }
 
 function counts(){
@@ -464,8 +481,8 @@ function counts(){
 }
 
 /* ---------- список ---------- */
-function render(keepQ){
-  const q = (keepQ !== undefined ? keepQ : (el('q') ? el('q').value : '')).trim().toLowerCase();
+function render(){
+  const q = query.trim().toLowerCase();
   let html = '', shown = 0;
 
   DATA.forEach((s, si) => {
@@ -578,7 +595,7 @@ function stats(){
   el('rail-links').innerHTML = DATA.map((s, si) => {
     const own = items.filter(i => i.sec === si);
     const d = own.filter(i => i.status === 'ok').length;
-    return '<a href="#sec' + si + '" class="' + (d === own.length ? 'full' : '') + '"><b>' + (si + 1) + '</b><span>' +
+    return '<a href="#" data-sec="' + si + '" class="' + (d === own.length ? 'full' : '') + '"><b>' + (si + 1) + '</b><span>' +
       esc(s.title.replace(/^\d+\.\s*/, '')) + '</span><u>' + d + '/' + own.length + '</u></a>';
   }).join('');
 
@@ -604,10 +621,16 @@ function addFiles(i, list){
 }
 
 document.addEventListener('click', e => {
-  const t = e.target.closest('#tpl-toggle,#acc-toggle,[data-gen],[data-copy],[data-tget],[data-tput],[data-open],[data-send],[data-no],[data-del],[data-go],[data-drive],[data-drop],[data-accept],[data-back],[data-unaccept],.chip');
+  const t = e.target.closest('[data-sec],#tpl-toggle,#acc-toggle,[data-gen],[data-copy],[data-tget],[data-tput],[data-open],[data-send],[data-no],[data-del],[data-go],[data-drive],[data-drop],[data-accept],[data-back],[data-unaccept],.chip');
   if (!t) return;
   const d = t.dataset;
 
+  if (d.sec !== undefined){
+    e.preventDefault();
+    const s = document.getElementById('sec' + d.sec);
+    if (s) s.scrollIntoView({behavior:'smooth', block:'start'});
+    return;
+  }
   if (t.id === 'tpl-toggle'){ tplOpen = !tplOpen; renderTpl(); return; }
   if (t.id === 'acc-toggle'){ accOpen = !accOpen; renderAccess(); return; }
   if (d.gen !== undefined){
@@ -681,7 +704,7 @@ document.addEventListener('input', e => {
   else if (d.backtext !== undefined) items[+d.backtext].back = e.target.value;
   else if (d.dl !== undefined) items[+d.dl].deadline = e.target.value;
   else if (d.acc !== undefined){ if (d.acc === 'crd') PASS_CRD = e.target.value; else ACCESS[d.acc] = e.target.value; }
-  else if (e.target.id === 'q') render();
+  else if (e.target.id === 'q'){ query = e.target.value; render(); }
 });
 
 document.addEventListener('dragover', e => { const z = e.target.closest('.drop'); if (!z) return; e.preventDefault(); z.classList.add('over'); });
@@ -702,27 +725,6 @@ el('city').onchange = () => {
 el('f-report').onclick = () => toast('Опись выгрузится в XLSX — тот же файл, что ведёт координатор');
 
 /* ---------- роль и территория ---------- */
-const PAGES = {'Город 1':'gorod-1.html', 'Город 2':'gorod-2.html', 'Город 3':'gorod-3.html'};
-const ACCESS = {'Город 1':'1234', 'Город 2':'1234', 'Город 3':'1234'};
-let PASS_CRD = '1234';
-let accOpen = true;
-
-function renderAccess(){
-  if (ROLE !== 'crd'){ el('acc-box').innerHTML = ''; return; }
-  el('acc-box').innerHTML =
-    '<div class="tpl' + (accOpen ? ' open' : '') + '"><button class="tpl-h" id="acc-toggle" aria-expanded="' + accOpen + '">' +
-    'Доступы администраций<u>пароли выдаёте вы</u></button><div class="tpl-b"><ul>' +
-    CITIES.map(c =>
-      '<li><span class="tn">' + esc(c) + '<span>pbsreda.ru/' + PAGES[c] + '</span></span>' +
-      '<span class="ta"><input class="pw" data-acc="' + esc(c) + '" value="' + esc(ACCESS[c]) + '" aria-label="Пароль ' + esc(c) + '">' +
-      '<button class="btn" data-gen="' + esc(c) + '">Случайный</button>' +
-      '<button class="btn" data-copy="' + esc(c) + '">Скопировать доступ</button></span></li>').join('') +
-    '<li><span class="tn">Кабинет координатора<span>pbsreda.ru/koordinator.html</span></span>' +
-      '<span class="ta"><input class="pw" data-acc="crd" value="' + esc(PASS_CRD) + '" aria-label="Пароль координатора">' +
-      '<button class="btn" data-gen="crd">Случайный</button></span></li>' +
-    '</ul><p class="hint" style="margin:12px 0 0">Новый пароль действует сразу. Администрации сообщите его сами — вместе со ссылкой на страницу города.</p></div></div>';
-}
-const newPass = () => Math.random().toString(36).slice(2, 6) + '-' + Math.random().toString(36).slice(2, 6);
 
 function applyRole(){
   items = STATE[CITY];
@@ -734,7 +736,7 @@ function applyRole(){
     ? 'Кулиджанова Нана · проверка и приём документов по всем территориям'
     : 'Координатор бюро — Кулиджанова Нана · <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>';
   document.title = CITY + ' — сбор документов заявки';
-  filter = 'all'; chips(); render('');
+  filter = 'all'; query = ''; chips(); render();
 }
 
 if (ROLE === 'crd'){
@@ -765,6 +767,11 @@ function enter(){
   const p = el('g-pass').value.trim();
   if (!p){ el('g-err').textContent = 'Введите пароль'; el('g-pass').focus(); return; }
   if (p !== (r === 'crd' ? PASS_CRD : ACCESS[el('g-city').value])){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
+  if (r === 'adm' && !CITIES.includes(el('g-city').value)){
+    el('g-err').textContent = 'Профайл этого города ещё не добавлен';
+    try { location.href = 'gorod-net.html'; } catch (err) {}
+    return;
+  }
   ROLE = r;
   CITY = r === 'crd' ? CITY : el('g-city').value;
   el('gate').hidden = true;

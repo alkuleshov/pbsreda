@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
+  color-scheme:light;
   --green:#11A138;
   --green-dark:#0C7C2B;
   --green-pale:#EAF6ED;
@@ -45,10 +46,10 @@ body.crd .toast{border-color:var(--green)}
 body.crd .msg.back{border-left-color:var(--pink)}
 
 *{box-sizing:border-box}
-html,body{margin:0;padding:0}
+html,body{margin:0;padding:0;background:#fff}
 body{font-family:'Golos Text',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);
   background:var(--paper);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
-button,input,textarea,select{font:inherit;color:inherit}
+button,input,textarea,select{font:inherit;color:var(--ink);background:#fff}
 a{color:var(--green-dark)}
 body.locked{overflow:hidden}
 
@@ -251,7 +252,19 @@ body.locked{overflow:hidden}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
-<style>.gate{position:static;overflow:visible}</style>
+<style>
+.gate{position:static;overflow:visible}
+.cta{margin-top:26px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.cta .btn-main{padding:11px 20px}
+.cta-hint{font-size:13px;color:var(--ink-2)}
+.req-form{margin-top:22px;padding:20px;border:1px solid var(--line);border-radius:var(--r)}
+.req-form[hidden]{display:none}
+.req-form .acts{margin-top:16px}
+.site-foot{border-top:1px solid var(--line);margin-top:60px}
+.site-foot-in{max-width:1000px;margin:0 auto;padding:20px 24px;display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-3)}
+.sf-right{margin-left:auto}
+@media (max-width:600px){.sf-right{margin-left:0}}
+</style>
 </head>
 <body>
 <div class="gate" id="gate">
@@ -266,6 +279,29 @@ body.locked{overflow:hidden}
           <li><b>5</b>победителей Всероссийского<br>конкурса Минстроя</li>
           <li><b>73</b>заявки-победителя<br>на региональные гранты</li>
         </ul>
+
+        <div class="cta">
+          <button class="btn btn-main" id="req-open">Подать заявку на сопровождение</button>
+          <span class="cta-hint">Разберём вашу территорию и скажем, есть ли шансы в этом сезоне</span>
+        </div>
+
+        <div class="req-form" id="req-form" hidden>
+          <div class="grid2">
+            <div class="f"><label for="r-city">Муниципальное образование</label><input id="r-city" placeholder="Город, район, регион"></div>
+            <div class="f"><label for="r-fio">Кто обращается</label><input id="r-fio" placeholder="ФИО и должность"></div>
+          </div>
+          <div class="grid2" style="margin-top:12px">
+            <div class="f"><label for="r-contact">Телефон и почта</label><input id="r-contact" placeholder="+7 ··· · почта"></div>
+            <div class="f"><label for="r-task">Что нужно</label><input id="r-task" placeholder="Заявка на конкурс, мастер-план, консультация"></div>
+          </div>
+          <div class="f" style="margin-top:12px"><label for="r-note">Коротко о территории</label>
+            <textarea id="r-note" placeholder="Какое место планируете заявлять, что уже сделано, какие сроки"></textarea></div>
+          <div class="acts">
+            <button class="btn btn-main" id="req-send">Отправить заявку</button>
+            <button class="btn" id="req-cancel">Отмена</button>
+            <span class="hint" id="req-msg"></span>
+          </div>
+        </div>
       </div>
 
       <div class="gate-card">
@@ -280,6 +316,13 @@ body.locked{overflow:hidden}
             <option>Город 1</option>
             <option>Город 2</option>
             <option>Город 3</option>
+            <option>Город 4</option>
+            <option>Город 5</option>
+            <option>Город 6</option>
+            <option>Город 7</option>
+            <option>Город 8</option>
+            <option>Город 9</option>
+            <option>Город 10</option>
           </select>
         </div>
         <div class="f">
@@ -295,10 +338,18 @@ body.locked{overflow:hidden}
 </div>
 
 
+<footer class="site-foot">
+  <div class="site-foot-in">
+    <span>© 2026 Проектное бюро «Среда». Все права защищены.</span>
+    <span class="sf-right">pbsreda.ru · <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a></span>
+  </div>
+</footer>
+
 <script>
 const el = id => document.getElementById(id);
 const PAGES = {'Город 1':'gorod-1.html','Город 2':'gorod-2.html','Город 3':'gorod-3.html'};
-const PASS_ADM = '1234', PASS_CRD = '1234';
+const ACCESS = {'Город 1':'1234', 'Город 2':'1234', 'Город 3':'1234'};
+const PASS_CRD = '1234';
 let ROLE = 'adm';
 
 function setTab(r){
@@ -317,13 +368,26 @@ el('tab-crd').onclick = () => setTab('crd');
 function enter(){
   const p = el('g-pass').value.trim();
   if (!p){ el('g-err').textContent = 'Введите пароль'; el('g-pass').focus(); return; }
-  if (p !== (ROLE === 'crd' ? PASS_CRD : PASS_ADM)){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
-  const target = ROLE === 'crd' ? 'koordinator.html' : PAGES[el('g-city').value];
+  if (p !== (ROLE === 'crd' ? PASS_CRD : ACCESS[el('g-city').value])){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
+  const target = ROLE === 'crd' ? 'koordinator.html' : (PAGES[el('g-city').value] || 'gorod-net.html');
   try { location.href = target; } catch (err) {}
   setTimeout(() => { el('g-err').textContent = 'Страница ' + target + ' не открылась — откройте файл вручную'; }, 1500);
 }
 el('g-go').onclick = enter;
 el('g-pass').onkeydown = e => { if (e.key === 'Enter') enter(); };
+el('req-open').onclick = () => {
+  el('req-form').hidden = false;
+  el('req-open').disabled = true;
+  el('r-city').focus();
+};
+el('req-cancel').onclick = () => { el('req-form').hidden = true; el('req-open').disabled = false; el('req-msg').textContent = ''; };
+el('req-send').onclick = () => {
+  const city = el('r-city').value.trim(), contact = el('r-contact').value.trim();
+  if (!city || !contact){ el('req-msg').textContent = 'Заполните территорию и контакты — по ним свяжется координатор'; return; }
+  el('req-form').innerHTML = '<p style="margin:0;font-size:14px"><b>Заявка отправлена.</b> Координатор бюро свяжется в течение рабочего дня. ' +
+    'Если нужно быстрее — <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>.</p>';
+};
+
 el('g-pass').focus();
 </script>
 </body>
