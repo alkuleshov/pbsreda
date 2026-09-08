@@ -863,7 +863,9 @@ el('g-pass').onkeydown = e => { if (e.key === 'Enter') enter(); };
 el('logout').onclick = () => {
   const msg = (isCrd() && anyDirty())
     ? 'Есть несохранённые изменения в настройках территорий. Выйти без сохранения?'
-    : 'Выйти из профиля? Чтобы вернуться, понадобится пароль.';
+    : ROLE === 'adm'
+      ? 'Вы уверены, что хотите выйти? Загруженные файлы уже у бюро, ничего не потеряется.'
+      : 'Вы уверены, что хотите выйти?';
   if (!confirm(msg)) return;
   try { location.href = 'index.html'; } catch (err) {}
   setTimeout(showGate, 400);
