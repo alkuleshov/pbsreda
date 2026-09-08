@@ -291,7 +291,7 @@ body.locked{overflow:hidden}
           <button id="tab-adm" role="tab" aria-selected="true">Администрация</button>
           <button id="tab-bur" role="tab" aria-selected="false">Бюро</button>
         </div>
-        <p class="sub" id="g-sub">Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт координатор бюро.</p>
+        <p class="sub" id="g-sub">Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт куратор бюро.</p>
         <div class="f" id="g-city-f">
           <label for="g-city">Территория</label>
           <select id="g-city">
@@ -310,7 +310,8 @@ body.locked{overflow:hidden}
         <div class="f" id="b-role-f" hidden>
           <label for="b-role">Кабинет</label>
           <select id="b-role">
-            <option value="crd">Координатор</option>
+            <option value="crd">Куратор</option>
+            <option value="mgr">Менеджер</option>
             <option value="spec">Специалист</option>
           </select>
         </div>
@@ -320,7 +321,7 @@ body.locked{overflow:hidden}
         </div>
         <p class="err" id="g-err"></p>
         <button class="btn btn-main" id="g-go">Войти</button>
-        <p class="foot-note">Не подходит пароль — напишите координатору: <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>. Каждая территория видит только свои документы и свою папку на диске.</p>
+        <p class="foot-note">Не подходит пароль — напишите куратору: <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>. Каждая территория видит только свои документы и свою папку на диске.</p>
       </div>
     </div>
     <div class="req-form" id="req-form" hidden>
@@ -353,7 +354,7 @@ body.locked{overflow:hidden}
 const el = id => document.getElementById(id);
 const PAGES = {'Город 1':'city1', 'Город 2':'city2', 'Город 3':'city3', 'Город 4':'city4', 'Город 5':'city5', 'Город 6':'city6', 'Город 7':'city7', 'Город 8':'city8', 'Город 9':'city9', 'Город 10':'city10'};
 const ACCESS = {'Город 1':'1234', 'Город 2':'1234', 'Город 3':'1234', 'Город 4':'1234', 'Город 5':'1234', 'Город 6':'1234', 'Город 7':'1234', 'Город 8':'1234', 'Город 9':'1234', 'Город 10':'1234'};
-const PASS_CRD = '1234', PASS_SPEC = '1234';
+const PASS_BUR = {crd:'1234', mgr:'1234', spec:'1234'};
 let TAB = 'adm';
 
 function setTab(r){
@@ -363,8 +364,8 @@ function setTab(r){
   el('g-city-f').hidden = r !== 'adm';
   el('b-role-f').hidden = r !== 'bur';
   el('g-sub').textContent = r === 'bur'
-    ? 'Кабинеты бюро: приём документов у координатора, сроки по материалам у специалиста.'
-    : 'Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт координатор бюро.';
+    ? 'Кабинеты бюро: куратор принимает документы, менеджер видит картину целиком, специалист — сроки по своим материалам.'
+    : 'Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт куратор бюро.';
   el('g-err').textContent = '';
 }
 el('tab-adm').onclick = () => setTab('adm');
@@ -380,8 +381,8 @@ function enter(){
     target = PAGES[c] + '.html';
   } else {
     const r = el('b-role').value;
-    need = r === 'crd' ? PASS_CRD : PASS_SPEC;
-    target = r === 'crd' ? 'coor.html' : 'spec.html';
+    need = PASS_BUR[r];
+    target = r === 'crd' ? 'cur.html' : r === 'mgr' ? 'man.html' : 'spec.html';
   }
   if (p !== need){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
   try { location.href = target; } catch (err) {}
@@ -395,7 +396,7 @@ el('req-cancel').onclick = () => { el('req-form').hidden = true; el('req-open').
 el('req-send').onclick = () => {
   const city = el('r-city').value.trim(), contact = el('r-contact').value.trim();
   if (!city || !contact){ el('req-msg').textContent = 'Заполните территорию и контакты — по ним свяжется координатор'; return; }
-  el('req-form').innerHTML = '<p style="margin:0;font-size:14px"><b>Заявка отправлена.</b> Координатор бюро свяжется в течение рабочего дня. ' +
+  el('req-form').innerHTML = '<p style="margin:0;font-size:14px"><b>Заявка отправлена.</b> Куратор бюро свяжется в течение рабочего дня. ' +
     'Если нужно быстрее — <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>.</p>';
 };
 el('g-pass').focus();

@@ -26,7 +26,7 @@
   --red-pale:#FBEDEB;
   --r:3px;
 }
-/* фиолетово-розовая тема кабинета координатора */
+/* фиолетово-розовая тема кабинета куратора */
 body.crd{
   --green:#8B2FC7;
   --green-dark:#6E1FA3;
@@ -36,28 +36,24 @@ body.crd{
   --pink-dark:#A81C68;
 }
 body.crd .s-sent .st{color:var(--pink-dark);border-color:var(--green-soft);background:#FDF0F7}
-body.crd .num.sent b{color:var(--pink)}
 body.crd .role{border-color:var(--green);color:var(--green-dark);background:var(--green-pale)}
-body.crd .tabs button[aria-selected="true"]{background:var(--green);color:#fff}
 body.crd .gate-card{border-color:var(--green)}
 body.crd .sec-h{border-bottom-color:var(--green)}
 body.crd .chip[aria-pressed="true"]{border-color:var(--green);color:var(--green-dark);box-shadow:inset 0 0 0 1px var(--green)}
 body.crd .toast{border-color:var(--green)}
-body.crd .msg.back{border-left-color:var(--pink)}
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:#fff}
 body{font-family:'Golos Text',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:var(--ink);
-  background:var(--paper);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+  font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
 button,input,textarea,select{font:inherit;color:var(--ink);background:#fff}
 a{color:var(--green-dark)}
 body.locked{overflow:hidden}
 
-/* ---------- Первый экран: бюро + вход ---------- */
+/* ---------- экран входа ---------- */
 .gate{position:fixed;inset:0;background:#fff;z-index:60;overflow:auto}
 .gate[hidden]{display:none}
-.top-right .btn{padding:6px 12px;font-size:13px}
-.gate-in{max-width:1000px;margin:0 auto;padding:34px 24px 60px}
+.gate-in{max-width:1000px;margin:0 auto;padding:34px 24px 40px}
 .gate img{height:38px;display:block}
 .gate-cols{display:grid;grid-template-columns:1fr 340px;gap:64px;align-items:start;margin-top:56px}
 .gate-about h1{font-size:29px;font-weight:700;margin:0 0 16px;letter-spacing:-.02em;line-height:1.18;max-width:16ch}
@@ -66,19 +62,21 @@ body.locked{overflow:hidden}
 .gate-about ul{list-style:none;margin:24px 0 0;padding:18px 0 0;border-top:1px solid var(--line);display:flex;gap:34px;flex-wrap:wrap}
 .gate-about ul li{font-size:13px;color:var(--ink-2);line-height:1.35}
 .gate-about ul li b{display:block;font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.cta{margin-top:26px}
+.cta .btn-main{display:inline-block;text-decoration:none;padding:11px 20px}
 .gate-card{border:1px solid var(--ink);border-radius:var(--r);padding:22px}
-.tabs{display:flex;gap:0;margin:-4px -4px 18px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.tabs{display:flex;margin:-4px -4px 18px;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .tabs button{flex:1;border:0;background:#fff;padding:9px 6px;font-size:13px;cursor:pointer;color:var(--ink-2)}
 .tabs button+button{border-left:1px solid var(--line)}
 .tabs button[aria-selected="true"]{background:var(--ink);color:#fff;font-weight:600}
 .gate-card p.sub{margin:0 0 20px;color:var(--ink-2);font-size:13.5px;line-height:1.45}
 .gate .f{margin-bottom:14px}
-.gate select,.gate input{width:100%;border:1px solid var(--line);border-radius:var(--r);padding:10px 11px;background:#fff}
+.gate select,.gate input{width:100%;border:1px solid var(--line);border-radius:var(--r);padding:10px 11px}
 .gate .btn-main{width:100%;padding:11px;margin-top:6px}
 .gate .err{color:var(--red);font-size:13px;margin:10px 0 0;min-height:18px}
 .gate .foot-note{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3);line-height:1.5}
 
-/* ---------- Шапка ---------- */
+/* ---------- шапка ---------- */
 .top{border-bottom:1px solid var(--line)}
 .top-in{max-width:1180px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
 .logo{height:34px;display:block}
@@ -86,36 +84,39 @@ body.locked{overflow:hidden}
 .top-title{font-weight:600;font-size:15px}
 .top-title span{display:block;font-weight:400;font-size:13px;color:var(--ink-2)}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.top-right .btn{padding:6px 12px;font-size:13px}
 .role{font-size:12.5px;border:1px solid var(--ink);border-radius:100px;padding:3px 11px;font-weight:600}
 .city-pick{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
-.city-pick select{border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;background:#fff;font-weight:600;color:var(--ink)}
+.city-pick select{border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;font-weight:600}
 
-/* ---------- Опись ---------- */
+/* ---------- опись и инфоблок ---------- */
 .hero{border-bottom:1px solid var(--line)}
 .hero-in{max-width:1180px;margin:0 auto;padding:26px 24px 24px}
-.hero-head{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:16px}
-.hero-city{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
-.hero-city em{font-style:normal;color:var(--ink-2);font-weight:500;font-size:16px;display:block;letter-spacing:0}
-.hero-nums{margin-left:auto;display:flex;gap:28px;text-align:right}
-.num b{display:block;font-size:26px;font-weight:700;line-height:1.1}
-.num i{font-style:normal;font-size:12px;color:var(--ink-2)}
-.num.ok b{color:var(--green)}
-.num.bad b{color:var(--red)}
+.hero-head{display:flex;align-items:flex-start;gap:28px;flex-wrap:wrap;margin-bottom:18px}
+.hero-city{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.15;padding-top:2px}
+.hero-city em{font-style:normal;color:var(--ink-2);font-weight:500;font-size:15px;display:block;letter-spacing:0;margin-top:4px}
+.info{margin-left:auto;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;min-width:300px;max-width:420px}
+.info .ir{display:flex;gap:12px;font-size:13.5px;padding:5px 0}
+.info .ir b{font-weight:600;white-space:nowrap}
+.info .ir span{color:var(--ink-2);margin-left:auto;text-align:right}
+.info .vote{margin-top:8px;padding-top:10px;border-top:1px solid var(--line-2)}
+.info .vote-n{display:flex;align-items:baseline;gap:8px}
+.info .vote-n b{font-size:23px;font-weight:700;line-height:1.1}
+.info .vote-n span{font-size:13px;color:var(--ink-2)}
+.info .vbar{height:5px;background:var(--line-2);border-radius:100px;margin-top:8px;overflow:hidden}
+.info .vbar i{display:block;height:100%;background:var(--green);width:0}
+.info .fin{margin-top:12px;display:block;text-align:center;padding:8px}
 .tally{display:flex;gap:2px;height:26px}
 .tick{flex:1;background:#fff;border:1px solid var(--line);border-radius:1px;cursor:pointer;padding:0;min-width:0;transition:transform .12s}
 .tick:hover{transform:scaleY(1.18)}
-.tick.part{background:var(--grey);border-color:var(--grey)}
 .tick.sent{background:var(--green-soft);border-color:var(--green-soft)}
 .tick.ok{background:var(--green);border-color:var(--green)}
-.tick.no{background:var(--red);border-color:var(--red)}
 .tally-legend{display:flex;gap:16px;margin-top:10px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
 .dot{display:inline-block;width:9px;height:9px;border-radius:1px;margin-right:6px;vertical-align:-1px;border:1px solid var(--line);background:#fff}
-.dot.part{background:var(--grey);border-color:var(--grey)}
 .dot.sent{background:var(--green-soft);border-color:var(--green-soft)}
 .dot.ok{background:var(--green);border-color:var(--green)}
-.dot.no{background:var(--red);border-color:var(--red)}
 
-/* ---------- Каркас ---------- */
+/* ---------- каркас ---------- */
 .wrap{max-width:1180px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:236px 1fr;gap:40px;align-items:start}
 .rail{position:sticky;top:20px;padding:26px 0 40px}
 .rail h3{font-size:12px;font-weight:600;color:var(--ink-3);margin:0 0 12px}
@@ -128,83 +129,16 @@ body.locked{overflow:hidden}
 .rail-note b{color:var(--ink);display:block;margin-bottom:4px;font-size:13px}
 .main{padding:26px 0 140px;min-width:0}
 
-/* ---------- Фильтры ---------- */
+/* ---------- фильтры ---------- */
 .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:22px}
 .chip{border:1px solid var(--line);background:#fff;border-radius:100px;padding:6px 13px;font-size:13px;cursor:pointer;color:var(--ink-2)}
 .chip:hover{border-color:var(--ink-3)}
 .chip[aria-pressed="true"]{border-color:var(--ink);color:var(--ink);font-weight:600;box-shadow:inset 0 0 0 1px var(--ink)}
 .search{margin-left:auto}
-.search input{border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;width:230px;background:#fff}
+.search input{border:1px solid var(--line);border-radius:var(--r);padding:8px 12px;width:230px}
 .search input:focus{outline:2px solid var(--green);outline-offset:-1px;border-color:transparent}
 
-/* ---------- Разделы и строки ---------- */
-.sec{margin-bottom:34px;scroll-margin-top:16px}
-.sec-h{display:flex;align-items:baseline;gap:12px;padding-bottom:9px;border-bottom:1px solid var(--ink);margin-bottom:2px}
-.sec-h h2{font-size:17px;font-weight:700;margin:0;letter-spacing:-.01em}
-.sec-h span{margin-left:auto;font-size:13px;color:var(--ink-2);white-space:nowrap}
-.sec-done{font-size:12.5px;color:var(--ink-3);padding:9px 12px;border-bottom:1px solid var(--line-2)}
-.sec-done b{color:var(--green-dark);font-weight:600}
-
-.row{border-bottom:1px solid var(--line-2)}
-.row-h{display:grid;grid-template-columns:62px 1fr auto;gap:14px;align-items:baseline;padding:13px 10px 13px 12px;cursor:pointer;background:none;border:0;width:100%;text-align:left;border-left:3px solid transparent}
-.row-h:hover{background:var(--hover)}
-.row-h:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
-.row.s-part .row-h{border-left-color:var(--grey)}
-.row.s-sent .row-h{border-left-color:var(--green-soft)}
-.row.s-ok .row-h{border-left-color:var(--green)}
-.row.s-no .row-h{border-left-color:var(--red)}
-.rn{font-size:12.5px;color:var(--ink-3);font-weight:500;padding-top:2px;overflow-wrap:anywhere}
-.rt{min-width:0}
-.rt b{font-weight:600;font-size:14.5px;display:block;margin-bottom:2px}
-.rt b i{font-style:normal;color:var(--green-dark);font-weight:700}
-.rt p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.4}
-.st{font-size:12.5px;white-space:nowrap;padding:3px 9px;border-radius:100px;background:#fff;color:var(--ink-2);border:1px solid var(--line)}
-.s-part .st{color:var(--ink);border-color:var(--ink-3)}
-.s-sent .st{color:var(--green-dark);border-color:var(--green-soft)}
-.s-ok .st{background:var(--green-pale);color:var(--green-dark);border-color:#C4E5CE;font-weight:600}
-.s-no .st{background:var(--red-pale);color:var(--red);border-color:#F0CDC8}
-
-/* ---------- Раскрытая строка ---------- */
-.body{display:none;padding:4px 12px 24px 76px;border-left:3px solid var(--line)}
-.row.open .body{display:block}
-.req{display:flex;gap:10px;font-size:13.5px;padding:12px 0 14px}
-.req em{font-style:normal;color:var(--ink-2);flex:0 0 auto}
-.path{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:8px 11px;margin-bottom:14px;overflow:auto;white-space:nowrap}
-.path svg{flex:0 0 auto}
-.path b{color:var(--ink);font-weight:600}
-.path a{margin-left:auto;padding-left:14px;white-space:nowrap}
-.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:border-color .15s}
-.drop:hover,.drop.over{border-color:var(--green)}
-.drop p{margin:0;font-size:13.5px;color:var(--ink-2)}
-.drop p b{color:var(--green-dark);font-weight:600}
-.drop small{display:block;margin-top:4px;font-size:12px;color:var(--ink-3)}
-.files{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
-.files li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:var(--r);padding:8px 11px;font-size:13.5px}
-.files .fi{flex:0 0 auto;color:var(--green)}
-.files .fn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.files .fs{color:var(--ink-3);font-size:12.5px;margin-left:auto;flex:0 0 auto}
-.files button{border:0;background:none;color:var(--ink-3);cursor:pointer;padding:2px 4px;font-size:16px;line-height:1}
-.files button:hover{color:var(--red)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.f label{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:5px}
-.f input,.f textarea{width:100%;border:1px solid var(--line);border-radius:var(--r);padding:8px 11px;background:#fff}
-.f input:focus,.f textarea:focus{outline:2px solid var(--green);outline-offset:-1px;border-color:transparent}
-.f textarea{resize:vertical;min-height:64px}
-.acts{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
-.btn{border:1px solid var(--line);background:#fff;border-radius:var(--r);padding:9px 16px;cursor:pointer;font-size:13.5px}
-.btn:hover{border-color:var(--ink-3)}
-.btn-main{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
-.btn-main:hover{background:var(--green-dark);border-color:var(--green-dark)}
-.btn-main:disabled{background:#fff;border-color:var(--line);color:var(--ink-3);cursor:not-allowed}
-.btn-no{color:var(--red);border-color:#EBC9C4}
-.btn-no:hover{background:var(--red-pale);border-color:var(--red)}
-.hint{font-size:12.5px;color:var(--ink-3)}
-.msg{font-size:13px;border:1px solid var(--line);border-left:3px solid var(--ink-3);border-radius:var(--r);padding:10px 12px;margin:14px 0 0;line-height:1.45}
-.msg b{font-weight:600}
-.msg.back{border-left-color:var(--red)}
-.msg.ok{border-left-color:var(--green)}
-
-/* ---------- Шаблоны ---------- */
+/* ---------- блоки-панели ---------- */
 .tpl{border:1px solid var(--line);border-radius:var(--r);margin-bottom:20px}
 .tpl-h{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:13px 14px;cursor:pointer;text-align:left;font-size:14px;font-weight:600}
 .tpl-h:hover{background:var(--hover)}
@@ -219,13 +153,79 @@ body.locked{overflow:hidden}
 .tpl li .ta{margin-left:auto;flex:0 0 auto;display:flex;gap:8px;align-items:center}
 .tpl .soon{font-size:12.5px;color:var(--ink-3);border:1px dashed var(--line);border-radius:100px;padding:3px 10px}
 .tpl .btn{padding:6px 12px;font-size:13px}
+.cityset{border-bottom:1px solid var(--line-2);padding:14px 0}
+.cityset:last-child{border-bottom:0}
+.cityset h4{margin:0 0 10px;font-size:14px;font-weight:600}
+.cityset .g{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cityset .g .f label{font-size:12px}
+.cityset .g input{width:100%;border:1px solid var(--line);border-radius:var(--r);padding:7px 10px;font-size:13px}
+.cityset .acts{margin-top:10px}
+.cityset .acts .btn{padding:6px 12px;font-size:13px}
+
+/* ---------- строки ---------- */
+.sec{margin-bottom:34px;scroll-margin-top:16px}
+.sec-h{display:flex;align-items:baseline;gap:12px;padding-bottom:9px;border-bottom:1px solid var(--ink);margin-bottom:2px}
+.sec-h h2{font-size:17px;font-weight:700;margin:0;letter-spacing:-.01em}
+.sec-h span{margin-left:auto;font-size:13px;color:var(--ink-2);white-space:nowrap}
+.sec-done{font-size:12.5px;color:var(--ink-3);padding:9px 12px;border-bottom:1px solid var(--line-2)}
+.sec-done b{color:var(--green-dark);font-weight:600}
+.row{border-bottom:1px solid var(--line-2)}
+.row-h{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:baseline;padding:13px 10px 13px 12px;cursor:pointer;background:none;border:0;width:100%;text-align:left;border-left:3px solid transparent}
+.row-h:hover{background:var(--hover)}
+.row-h:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+.row.s-sent .row-h{border-left-color:var(--green-soft)}
+.row.s-ok .row-h{border-left-color:var(--green)}
+.rn{font-size:12.5px;color:var(--ink-3);font-weight:500;padding-top:2px;overflow-wrap:anywhere}
+.rt{min-width:0}
+.rt b{font-weight:600;font-size:14.5px;display:block;margin-bottom:2px}
+.rt b i{font-style:normal;color:var(--green-dark);font-weight:700}
+.rt p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.4}
+.st{font-size:12.5px;white-space:nowrap;padding:3px 9px;border-radius:100px;background:#fff;color:var(--ink-2);border:1px solid var(--line)}
+.s-sent .st{color:var(--green-dark);border-color:var(--green-soft)}
+.s-ok .st{background:var(--green-pale);color:var(--green-dark);border-color:#C4E5CE;font-weight:600}
+.done-tag{font-size:12.5px;border:1px solid var(--green);color:var(--green-dark);border-radius:100px;padding:3px 9px;margin-left:6px}
+
+/* ---------- раскрытая строка ---------- */
+.body{display:none;padding:4px 12px 24px 66px;border-left:3px solid var(--line)}
+.row.open .body{display:block}
+.req{display:flex;gap:10px;font-size:13.5px;padding:12px 0 14px}
+.req em{font-style:normal;color:var(--ink-2);flex:0 0 auto}
+.path{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:8px 11px;margin-bottom:14px;overflow:auto;white-space:nowrap}
+.path b{color:var(--ink);font-weight:600}
+.path a{margin-left:auto;padding-left:14px;white-space:nowrap}
 .rowtpl{display:flex;align-items:center;gap:10px;font-size:13px;border:1px solid var(--line);border-radius:var(--r);padding:9px 11px;margin-bottom:14px}
 .rowtpl em{font-style:normal;color:var(--ink-2)}
 .rowtpl .ta{margin-left:auto}
-.tpl input.pw{border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;width:130px;background:#fff;font-size:13px}
-.tpl input.pw:focus{outline:2px solid var(--green);outline-offset:-1px;border-color:transparent}
+.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:border-color .15s}
+.drop:hover,.drop.over{border-color:var(--green)}
+.drop p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.drop p b{color:var(--green-dark);font-weight:600}
+.drop small{display:block;margin-top:4px;font-size:12px;color:var(--ink-3)}
+.files{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.files li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:var(--r);padding:8px 11px;font-size:13.5px}
+.files .fi{flex:0 0 auto;color:var(--green)}
+.files .fn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.files .fs{color:var(--ink-3);font-size:12.5px;margin-left:auto;flex:0 0 auto}
+.files button{border:0;background:none;color:var(--ink-3);cursor:pointer;padding:2px 4px;font-size:16px;line-height:1}
+.files button:hover{color:var(--red)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.f label{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:5px}
+.f input,.f textarea{width:100%;border:1px solid var(--line);border-radius:var(--r);padding:8px 11px}
+.f input:focus,.f textarea:focus{outline:2px solid var(--green);outline-offset:-1px;border-color:transparent}
+.f textarea{resize:vertical;min-height:64px}
+.acts{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;border-radius:var(--r);padding:9px 16px;cursor:pointer;font-size:13.5px}
+.btn:hover{border-color:var(--ink-3)}
+.btn-main{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.btn-main:hover{background:var(--green-dark);border-color:var(--green-dark)}
+.btn-main:disabled{background:#fff;border-color:var(--line);color:var(--ink-3);cursor:not-allowed}
+.hint{font-size:12.5px;color:var(--ink-3)}
+.msg{font-size:13px;border:1px solid var(--line);border-left:3px solid var(--ink-3);border-radius:var(--r);padding:10px 12px;margin:14px 0 0;line-height:1.45}
+.msg b{font-weight:600}
+.msg.back{border-left-color:var(--red)}
+.msg.ok{border-left-color:var(--green)}
 
-/* ---------- Низ ---------- */
+/* ---------- низ ---------- */
 .foot{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);z-index:20}
 .foot-in{max-width:1180px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .foot-bar{flex:1;min-width:160px;height:6px;background:var(--line-2);border-radius:100px;overflow:hidden}
@@ -237,16 +237,9 @@ body.locked{overflow:hidden}
   font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:40;max-width:80vw}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{padding:40px 12px;color:var(--ink-2);font-size:14px}
-.cta{margin-top:26px}
-.cta .btn-main{display:inline-block;text-decoration:none;padding:11px 20px}
-.site-foot{border-top:1px solid var(--line);margin-top:60px}
-.site-foot-in{max-width:1000px;margin:0 auto;padding:20px 24px;display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-3)}
-.sf-right{margin-left:auto}
-.logins{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:44px}
-.gate-card h2{font-size:17px;font-weight:700;margin:0 0 6px}
-.logins .tabs{margin:0 0 14px}
-@media (max-width:760px){.logins{grid-template-columns:1fr}}
 .page-foot{margin:40px 0 0;padding-top:18px;border-top:1px solid var(--line-2);font-size:12.5px;color:var(--ink-3)}
+.site-foot{border-top:1px solid var(--line);margin-top:60px}
+.site-foot-in{max-width:1000px;margin:0 auto;padding:20px 24px;font-size:12.5px;color:var(--ink-3)}
 
 @media (max-width:900px){
   .gate-cols{grid-template-columns:1fr;gap:36px;margin-top:34px}
@@ -258,9 +251,11 @@ body.locked{overflow:hidden}
   .body{padding-left:12px}
   .grid2{grid-template-columns:1fr}
   .hero-city{font-size:24px}
+  .info{margin-left:0;min-width:0;width:100%}
   .search{margin-left:0;width:100%}
   .search input{width:100%}
   .tick:hover{transform:none}
+  .cityset .g{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -286,26 +281,16 @@ body.locked{overflow:hidden}
           <button id="tab-adm" role="tab" aria-selected="true">Администрация</button>
           <button id="tab-bur" role="tab" aria-selected="false">Бюро</button>
         </div>
-        <p class="sub" id="g-sub">Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт координатор бюро.</p>
+        <p class="sub" id="g-sub">Раздел для администраций городов, с которыми бюро готовит заявку.</p>
         <div class="f" id="g-city-f">
           <label for="g-city">Территория</label>
-          <select id="g-city">
-            <option>Город 1</option>
-            <option>Город 2</option>
-            <option>Город 3</option>
-            <option>Город 4</option>
-            <option>Город 5</option>
-            <option>Город 6</option>
-            <option>Город 7</option>
-            <option>Город 8</option>
-            <option>Город 9</option>
-            <option>Город 10</option>
-          </select>
+          <select id="g-city"></select>
         </div>
         <div class="f" id="b-role-f" hidden>
           <label for="b-role">Кабинет</label>
           <select id="b-role">
-            <option value="crd">Координатор</option>
+            <option value="crd">Куратор</option>
+            <option value="mgr">Менеджер</option>
             <option value="spec">Специалист</option>
           </select>
         </div>
@@ -315,14 +300,12 @@ body.locked{overflow:hidden}
         </div>
         <p class="err" id="g-err"></p>
         <button class="btn btn-main" id="g-go">Войти</button>
-        <p class="foot-note">Не подходит пароль — напишите координатору: <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>. Каждая территория видит только свои документы и свою папку на диске.</p>
+        <p class="foot-note">Не подходит пароль — напишите куратору бюро. Каждая территория видит только свои документы и свою папку на диске.</p>
       </div>
     </div>
   </div>
   <footer class="site-foot">
-    <div class="site-foot-in">
-      <span>© 2026 Проектное бюро «Среда». Все права защищены.</span>
-    </div>
+    <div class="site-foot-in">© 2026 Проектное бюро «Среда». Все права защищены.</div>
   </footer>
 </div>
 
@@ -335,20 +318,9 @@ body.locked{overflow:hidden}
     </div>
     <div class="top-right">
       <span class="role" id="role-tag">Администрация</span>
-      <div class="city-pick">
+      <div class="city-pick" id="city-pick">
         <label for="city">Территория</label>
-        <select id="city">
-          <option>Город 1</option>
-          <option>Город 2</option>
-          <option>Город 3</option>
-          <option disabled>Город 4 — профайл не добавлен</option>
-          <option disabled>Город 5 — профайл не добавлен</option>
-          <option disabled>Город 6 — профайл не добавлен</option>
-          <option disabled>Город 7 — профайл не добавлен</option>
-          <option disabled>Город 8 — профайл не добавлен</option>
-          <option disabled>Город 9 — профайл не добавлен</option>
-          <option disabled>Город 10 — профайл не добавлен</option>
-        </select>
+        <select id="city"></select>
       </div>
       <button class="btn" id="logout">Выйти из профиля</button>
     </div>
@@ -358,23 +330,16 @@ body.locked{overflow:hidden}
 <section class="hero">
   <div class="hero-in">
     <div class="hero-head">
-      <div class="hero-city"><span id="hero-city">Город 1</span>
-        <em id="hero-sub">Координатор бюро — Кулиджанова Нана · <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a></em>
+      <div class="hero-city"><span id="hero-city">Город</span>
+        <em id="hero-sub"></em>
       </div>
-      <div class="hero-nums">
-        <div class="num ok"><b id="n-ok">0</b><i>принято</i></div>
-        <div class="num sent"><b id="n-sent">0</b><i>на проверке</i></div>
-        <div class="num bad"><b id="n-no">0</b><i>не предоставят</i></div>
-        <div class="num"><b id="n-left">48</b><i>осталось</i></div>
-      </div>
+      <div class="info" id="info"></div>
     </div>
     <div class="tally" id="tally" aria-label="Опись запросов"></div>
     <div class="tally-legend">
       <span><i class="dot"></i>не загружено</span>
-      <span><i class="dot part"></i>загружено частично</span>
       <span><i class="dot sent"></i>на проверке</span>
       <span><i class="dot ok"></i>принято</span>
-      <span><i class="dot no"></i>не предоставят</span>
       <span style="margin-left:auto">Одно деление — один запрос</span>
     </div>
   </div>
@@ -382,17 +347,17 @@ body.locked{overflow:hidden}
 
 <div class="wrap">
   <nav class="rail">
-    <h3>Разделы заявки</h3>
+    <h3>Блоки документов</h3>
     <div id="rail-links"></div>
     <div class="rail-note" id="rail-note"></div>
   </nav>
   <main class="main">
-    <div id="acc-box"></div>
+    <div id="set-box"></div>
     <div id="tpl-box"></div>
     <div class="bar" id="chips"></div>
     <div id="list"></div>
     <p class="empty" id="empty" hidden>По этому фильтру запросов нет.</p>
-      <p class="page-foot">© 2026 Проектное бюро «Среда». Все права защищены.</p>
+    <p class="page-foot">© 2026 Проектное бюро «Среда». Все права защищены.</p>
   </main>
 </div>
 
@@ -408,48 +373,44 @@ body.locked{overflow:hidden}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-const DATA = [{"title":"1. Сопроводительные документы","items":[{"n":"1.3","also":"","code":"ПРОТОКОЛ1","t":"Протокол № 1 общественной комиссии о выборе территории","need":"Скан с подписями и приложениями, PDF","nm":"Решение о выборе территории"},{"n":"1.4","also":"","code":"ПРОТОКОЛ2","t":"Протокол № 2 подведения итогов приёма предложений по мероприятиям","need":"Скан с подписями, PDF","nm":"Решение о перечне мероприятий"},{"n":"1.5.1","also":"4.3","code":"ГЕНПЛАН","t":"Генеральный план муниципального образования, актуальная редакция","need":"DWG + PDF","nm":"Схема в контексте города"},{"n":"1.5.4","also":"3.3","code":"РАЗВИТИЕ","t":"Мероприятия по развитию за 2022–2028: дороги, фасады, реконструкция, новое строительство","need":"Текст с адресами, стоимостью и годом реализации","nm":"Программы и инвестпроекты"},{"n":"1.9","also":"5.7","code":"НАСЕЛЕНИЕ","t":"Справка о численности населения на отчётную дату","need":"Справка на бланке, скан","nm":"Численность населения"},{"n":"1.10","also":"","code":"ЕГРН","t":"Выписки ЕГРН, схема границ, сведения о правообладателях","need":"PDF","nm":"Отсутствие претензий на участок"},{"n":"1.11","also":"4.3","code":"ОХРАНЗОНЫ","t":"Границы зон охраны объектов культурного наследия и исторического поселения","need":"Карта с нанесением зон и пояснением","nm":"Справка по культурному наследию"},{"n":"1.13","also":"4.4","code":"ТОПО","t":"Топографическая съёмка территории, не старше 3 лет","need":"DWG (М 1:500) + PDF","nm":"Актуальная топосъёмка"}]},{"title":"2. Общественное обсуждение и соучаствующее проектирование","items":[{"n":"2.1","also":"2.3","code":"ДК-ПОЛЬЗОВАТЕЛИ","t":"Кто сейчас активно пользуется ДК у территории: кружки, секции, праздники","need":"Перечень с численностью и расписанием","nm":"Социокультурное исследование"},{"n":"2.1","also":"2.2","code":"ОПРОС","t":"Распространение ссылки на онлайн-опрос по чатам, группам, коллективам","need":"Скрины рассылки, перечень чатов","nm":"Социокультурное исследование"},{"n":"2.1","also":"2.2","code":"ФОКУСГРУППА","t":"Список участников фокус-группы с должностями и контактами","need":"Таблица ФИО, должность, телефон","nm":"Социокультурное исследование"},{"n":"2.2","also":"","code":"КОМАНДА","t":"Состав «команды перемен»: директора школ, ДК, предприниматели, активисты","need":"Список ФИО, должность, телефон, XLSX","nm":"Соучаствующее проектирование"},{"n":"2.2","also":"2.4","code":"КОНКУРСЫ","t":"Тематика и сроки конкурса творческих работ (лого, детская площадка, входная группа, сочинение)","need":"Согласованный перечень номинаций и сроков","nm":"Соучаствующее проектирование"},{"n":"2.2","also":"","code":"СЕМИНАР-ПЛОЩАДКА","t":"Помещение и оборудование для проектного семинара на ~40 человек (не в администрации)","need":"Адрес, фото зала, подтверждение брони","nm":"Соучаствующее проектирование"},{"n":"2.2","also":"2.4","code":"СМИ","t":"Публикация протоколов в СМИ и на сайте администрации","need":"Ссылки + скриншоты с видимой датой","nm":"Соучаствующее проектирование"},{"n":"2.2","also":"2.4","code":"ФОРМЫ-СКРИНЫ","t":"Скрины (фото) всех форм сбора предложений в электронном виде","need":"Папка со скринами","nm":"Соучаствующее проектирование"},{"n":"2.3","also":"2.4","code":"СУББОТНИК","t":"Субботник / день древонасаждения на территории","need":"Дата проведения, фотоотчёт, список участников","nm":"Программа развития территории"}]},{"title":"3. Обоснованность выбора места и востребованность проекта","items":[{"n":"3.1","also":"","code":"МАСТЕРПЛАН","t":"Мастер-план территории (при наличии)","need":"PDF","nm":"Задачи развития муниципального образования"},{"n":"3.1","also":"","code":"ОТЧЁТЫ","t":"Отчёты о реализации муниципальных программ за 3 года","need":"PDF","nm":"Задачи развития муниципального образования"},{"n":"3.1","also":"","code":"ПОСТАНОВЛЕНИЯ","t":"Постановления и решения администрации и Собрания депутатов за 3 года по развитию территории","need":"PDF","nm":"Задачи развития муниципального образования"},{"n":"3.1","also":"","code":"СТРАТЕГИЯ","t":"Стратегия социально-экономического развития муниципального образования","need":"PDF, с датой утверждения","nm":"Задачи развития муниципального образования"},{"n":"3.3","also":"1.5.4","code":"МУНПРОГРАММЫ","t":"Действующие муниципальные программы с целями, задачами и этапами","need":"PDF","nm":"Механизмы синхронизации"},{"n":"3.3","also":"1.5.4","code":"ПСД","t":"Проектно-сметная документация и планы по инфраструктурным проектам (при наличии)","need":"PDF","nm":"Механизмы синхронизации"}]},{"title":"4. Альбом со схемами и графическими материалами","items":[{"n":"4.2","also":"5.4, 5.6","code":"БИЗНЕС","t":"Малый и средний бизнес в 10 минутах пешком (~500 м): магазины, рынки, кафе, услуги","need":"Текст с наименованиями и адресами","nm":"Обоснование выбора места"},{"n":"4.2","also":"1.6","code":"ИСТОРИЯ","t":"Историческая справка по основным вехам развития, в том числе об утраченных объектах","need":"Текст с фотографиями, контакты музеев и архивов","nm":"Обоснование выбора места"},{"n":"4.2","also":"1.11","code":"КУЛЬТОБЪЕКТЫ","t":"Объекты культурного значения: храмы, памятники, воинские захоронения, знаковые и событийные места","need":"Текст с фото, наименованиями и адресами","nm":"Обоснование выбора места"},{"n":"4.2","also":"3.1","code":"ПРОСТРАНСТВА","t":"Общественные пространства: парки, скверы, площади, зелёные зоны, аллеи, подходы к воде","need":"Объекты, нанесённые на Яндекс-карту","nm":"Обоснование выбора места"},{"n":"4.2","also":"3.2","code":"СОЦСФЕРА","t":"Объекты социальной сферы: ДК, ЗАГС, МФЦ, почта, школы, детсады, медицина, полиция","need":"Текст с наименованиями и адресами","nm":"Обоснование выбора места"},{"n":"4.3","also":"1.5.5","code":"ВОДА","t":"Схема водоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение"},{"n":"4.3","also":"1.5.5","code":"ГАЗ","t":"Схема газоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение"},{"n":"4.3","also":"5.3","code":"ЗАСТРОЙКА","t":"Многоэтажная застройка: жилые и общественные объекты выше 2 этажей","need":"Карта с адресами и числом квартир","nm":"Существующее положение"},{"n":"4.3","also":"1.5.5","code":"КАНАЛИЗАЦИЯ","t":"Схема канализации и водоотведения","need":"DWG + PDF от балансодержателя","nm":"Существующее положение"},{"n":"4.3","also":"","code":"ООПТ","t":"Охраняемые природные зоны в 10 минутах пешком, с указанием проблем","need":"Карта с нанесением зон и пояснением","nm":"Существующее положение"},{"n":"4.3","also":"4.4","code":"ПЗЗ","t":"Правила землепользования и застройки","need":"PDF + карта градостроительного зонирования","nm":"Существующее положение"},{"n":"4.3","also":"1.5.5","code":"СВЯЗЬ","t":"Схема сетей связи","need":"DWG + PDF от балансодержателя","nm":"Существующее положение"},{"n":"4.3","also":"1.5.5","code":"ТЕПЛО","t":"Схема теплоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение"},{"n":"4.3","also":"4.4","code":"ТРАНСПОРТ","t":"Транспортная инфраструктура: маршруты, остановки, вело- и турмаршруты, парковки","need":"Яндекс-карта с маршрутами и номерами","nm":"Существующее положение"},{"n":"4.3","also":"1.5.5","code":"ЭЛЕКТРО","t":"Схема электроснабжения и наружного освещения","need":"DWG + PDF от балансодержателя","nm":"Существующее положение"}]},{"title":"5. Технико-экономическое и финансовое обоснование","items":[{"n":"5.2","also":"5.9","code":"АНАЛОГ","t":"Объект-аналог: штатная численность, площадь территории, фактические расходы за год","need":"Заполненный шаблон XLSX","nm":"Эксплуатационные расходы"},{"n":"5.2","also":"5.9","code":"РАСХОДЫ","t":"Укрупнённый расчёт ежегодных эксплуатационных расходов по форме 5.2","need":"Заполненный шаблон XLSX","nm":"Эксплуатационные расходы"},{"n":"5.3","also":"5.5","code":"АРЕНДА","t":"Стоимость кв. м при сдаче в аренду коммерческой и государственной недвижимости","need":"Цифра + источник данных","nm":"Прогноз роста капитализации"},{"n":"5.3","also":"5.5","code":"ДЕЙСТВ-ГОС","t":"Действующие объекты государственной собственности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации"},{"n":"5.3","also":"5.4","code":"ЗАБРОШ-БИЗНЕС","t":"Заброшенные объекты предпринимательской деятельности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации"},{"n":"5.3","also":"","code":"ЗАБРОШ-ГОС","t":"Заброшенные объекты государственной собственности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации"},{"n":"5.6","also":"3.1","code":"ИНВЕСТСТРАТЕГИЯ","t":"Инвестиционная стратегия муниципального образования","need":"PDF","nm":"Потенциал развития предприятий"},{"n":"5.7","also":"","code":"ДЕМОГРАФИЯ","t":"Демографические показатели: отчёты территориального органа статистики","need":"PDF / XLSX","nm":"Демографические характеристики"},{"n":"5.7","also":"","code":"СТАТСБОРНИК","t":"Статистические сборники и доклады с обобщёнными данными за год","need":"PDF","nm":"Демографические характеристики"},{"n":"5.8","also":"3.1","code":"ПРОГНОЗ","t":"Прогноз социально-экономического развития муниципального образования","need":"PDF","nm":"Иные экономические и социальные эффекты"}]}];
-const CITIES = ['Город 1','Город 2','Город 3'];
+const DATA = [{"title":"Сопроводительные документы — строго по перечню заявки","items":[{"code":"ПРОТОКОЛ1","t":"Протокол № 1 общественной комиссии о выборе территории","need":"Скан с подписями и приложениями, PDF","nm":"Решение о выборе территории","n":"1.3","forr":""},{"code":"ПРОТОКОЛ2","t":"Протокол № 2 подведения итогов приёма предложений по мероприятиям","need":"Скан с подписями, PDF","nm":"Решение о перечне мероприятий","n":"1.4","forr":""},{"code":"ГЕНПЛАН","t":"Генеральный план муниципального образования, актуальная редакция","need":"DWG + PDF","nm":"Схема в контексте города","n":"1.5.1","forr":"4.3"},{"code":"РАЗВИТИЕ","t":"Мероприятия по развитию за 2022–2028: дороги, фасады, реконструкция, новое строительство","need":"Текст с адресами, стоимостью и годом реализации","nm":"Программы и инвестпроекты","n":"1.5.4","forr":"3.3"},{"code":"НАСЕЛЕНИЕ","t":"Справка о численности населения на отчётную дату","need":"Справка на бланке, скан","nm":"Численность населения","n":"1.9","forr":"5.7"},{"code":"ЕГРН","t":"Выписки ЕГРН, схема границ, сведения о правообладателях","need":"PDF","nm":"Отсутствие претензий на участок","n":"1.10","forr":""},{"code":"ОХРАНЗОНЫ","t":"Границы зон охраны объектов культурного наследия и исторического поселения","need":"Карта с нанесением зон и пояснением","nm":"Справка по культурному наследию","n":"1.11","forr":"4.3"},{"code":"ТОПО","t":"Топографическая съёмка территории, не старше 3 лет","need":"DWG (М 1:500) + PDF","nm":"Актуальная топосъёмка","n":"1.13","forr":"4.4"}]},{"title":"Территория, границы и градостроительные документы","items":[{"code":"ПЗЗ","t":"Правила землепользования и застройки","need":"PDF + карта градостроительного зонирования","nm":"Существующее положение","n":"1","forr":"4.3, 4.4"},{"code":"ООПТ","t":"Охраняемые природные зоны в 10 минутах пешком, с указанием проблем","need":"Карта с нанесением зон и пояснением","nm":"Существующее положение","n":"2","forr":"4.3"},{"code":"ЗАСТРОЙКА","t":"Многоэтажная застройка: жилые и общественные объекты выше 2 этажей","need":"Карта с адресами и числом квартир","nm":"Существующее положение","n":"3","forr":"4.3, 5.3"},{"code":"ПРОСТРАНСТВА","t":"Общественные пространства: парки, скверы, площади, зелёные зоны, аллеи, подходы к воде","need":"Объекты, нанесённые на Яндекс-карту","nm":"Обоснование выбора места","n":"4","forr":"3.1, 4.2"},{"code":"КУЛЬТОБЪЕКТЫ","t":"Объекты культурного значения: храмы, памятники, воинские захоронения, знаковые и событийные места","need":"Текст с фото, наименованиями и адресами","nm":"Обоснование выбора места","n":"5","forr":"1.11, 4.2"},{"code":"МАСТЕРПЛАН","t":"Мастер-план территории (при наличии)","need":"PDF","nm":"Задачи развития муниципального образования","n":"6","forr":"3.1"},{"code":"ИСТОРИЯ","t":"Историческая справка по основным вехам развития, в том числе об утраченных объектах","need":"Текст с фотографиями, контакты музеев и архивов","nm":"Обоснование выбора места","n":"7","forr":"1.6, 4.2"}]},{"title":"Инженерная и транспортная инфраструктура","items":[{"code":"ВОДА","t":"Схема водоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"1","forr":"1.5.5, 4.3"},{"code":"ГАЗ","t":"Схема газоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"2","forr":"1.5.5, 4.3"},{"code":"КАНАЛИЗАЦИЯ","t":"Схема канализации и водоотведения","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"3","forr":"1.5.5, 4.3"},{"code":"ТЕПЛО","t":"Схема теплоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"4","forr":"1.5.5, 4.3"},{"code":"ЭЛЕКТРО","t":"Схема электроснабжения и наружного освещения","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"5","forr":"1.5.5, 4.3"},{"code":"СВЯЗЬ","t":"Схема сетей связи","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"6","forr":"1.5.5, 4.3"},{"code":"ТРАНСПОРТ","t":"Транспортная инфраструктура: маршруты, остановки, вело- и турмаршруты, парковки","need":"Яндекс-карта с маршрутами и номерами","nm":"Существующее положение","n":"7","forr":"4.3, 4.4"}]},{"title":"Население и социальная сфера","items":[{"code":"ДЕМОГРАФИЯ","t":"Демографические показатели: отчёты территориального органа статистики","need":"PDF / XLSX","nm":"Демографические характеристики","n":"1","forr":"5.7"},{"code":"СТАТСБОРНИК","t":"Статистические сборники и доклады с обобщёнными данными за год","need":"PDF","nm":"Демографические характеристики","n":"2","forr":"5.7"},{"code":"СОЦСФЕРА","t":"Объекты социальной сферы: ДК, ЗАГС, МФЦ, почта, школы, детсады, медицина, полиция","need":"Текст с наименованиями и адресами","nm":"Обоснование выбора места","n":"3","forr":"3.2, 4.2"},{"code":"ДК-ПОЛЬЗОВАТЕЛИ","t":"Кто сейчас активно пользуется ДК у территории: кружки, секции, праздники","need":"Перечень с численностью и расписанием","nm":"Социокультурное исследование","n":"4","forr":"2.1, 2.3"}]},{"title":"Экономика, имущество и расходы","items":[{"code":"БИЗНЕС","t":"Малый и средний бизнес в 10 минутах пешком (~500 м): магазины, рынки, кафе, услуги","need":"Текст с наименованиями и адресами","nm":"Обоснование выбора места","n":"1","forr":"4.2, 5.4, 5.6"},{"code":"АРЕНДА","t":"Стоимость кв. м при сдаче в аренду коммерческой и государственной недвижимости","need":"Цифра + источник данных","nm":"Прогноз роста капитализации","n":"2","forr":"5.3, 5.5"},{"code":"ДЕЙСТВ-ГОС","t":"Действующие объекты государственной собственности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации","n":"3","forr":"5.3, 5.5"},{"code":"ЗАБРОШ-БИЗНЕС","t":"Заброшенные объекты предпринимательской деятельности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации","n":"4","forr":"5.3, 5.4"},{"code":"ЗАБРОШ-ГОС","t":"Заброшенные объекты государственной собственности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации","n":"5","forr":"5.3"},{"code":"ИНВЕСТСТРАТЕГИЯ","t":"Инвестиционная стратегия муниципального образования","need":"PDF","nm":"Потенциал развития предприятий","n":"6","forr":"3.1, 5.6"},{"code":"ПРОГНОЗ","t":"Прогноз социально-экономического развития муниципального образования","need":"PDF","nm":"Иные экономические и социальные эффекты","n":"7","forr":"3.1, 5.8"},{"code":"АНАЛОГ","t":"Объект-аналог: штатная численность, площадь территории, фактические расходы за год","need":"Заполненный шаблон XLSX","nm":"Эксплуатационные расходы","n":"8","forr":"5.2, 5.9"},{"code":"РАСХОДЫ","t":"Укрупнённый расчёт ежегодных эксплуатационных расходов по форме 5.2","need":"Заполненный шаблон XLSX","nm":"Эксплуатационные расходы","n":"9","forr":"5.2, 5.9"}]},{"title":"Программы, стратегии и решения администрации","items":[{"code":"СТРАТЕГИЯ","t":"Стратегия социально-экономического развития муниципального образования","need":"PDF, с датой утверждения","nm":"Задачи развития муниципального образования","n":"1","forr":"3.1"},{"code":"ОТЧЁТЫ","t":"Отчёты о реализации муниципальных программ за 3 года","need":"PDF","nm":"Задачи развития муниципального образования","n":"2","forr":"3.1"},{"code":"ПОСТАНОВЛЕНИЯ","t":"Постановления и решения администрации и Собрания депутатов за 3 года по развитию территории","need":"PDF","nm":"Задачи развития муниципального образования","n":"3","forr":"3.1"},{"code":"МУНПРОГРАММЫ","t":"Действующие муниципальные программы с целями, задачами и этапами","need":"PDF","nm":"Механизмы синхронизации","n":"4","forr":"1.5.4, 3.3"},{"code":"ПСД","t":"Проектно-сметная документация и планы по инфраструктурным проектам (при наличии)","need":"PDF","nm":"Механизмы синхронизации","n":"5","forr":"1.5.4, 3.3"}]},{"title":"Общественное участие и медиа","items":[{"code":"ОПРОС","t":"Распространение ссылки на онлайн-опрос по чатам, группам, коллективам","need":"Скрины рассылки, перечень чатов","nm":"Социокультурное исследование","n":"1","forr":"2.1, 2.2"},{"code":"ФОКУСГРУППА","t":"Список участников фокус-группы с должностями и контактами","need":"Таблица ФИО, должность, телефон","nm":"Социокультурное исследование","n":"2","forr":"2.1, 2.2"},{"code":"КОМАНДА","t":"Состав «команды перемен»: директора школ, ДК, предприниматели, активисты","need":"Список ФИО, должность, телефон, XLSX","nm":"Соучаствующее проектирование","n":"3","forr":"2.2"},{"code":"КОНКУРСЫ","t":"Тематика и сроки конкурса творческих работ (лого, детская площадка, входная группа, сочинение)","need":"Согласованный перечень номинаций и сроков","nm":"Соучаствующее проектирование","n":"4","forr":"2.2, 2.4"},{"code":"СЕМИНАР-ПЛОЩАДКА","t":"Помещение и оборудование для проектного семинара на ~40 человек (не в администрации)","need":"Адрес, фото зала, подтверждение брони","nm":"Соучаствующее проектирование","n":"5","forr":"2.2"},{"code":"СМИ","t":"Публикация протоколов в СМИ и на сайте администрации","need":"Ссылки + скриншоты с видимой датой","nm":"Соучаствующее проектирование","n":"6","forr":"2.2, 2.4"},{"code":"ФОРМЫ-СКРИНЫ","t":"Скрины (фото) всех форм сбора предложений в электронном виде","need":"Папка со скринами","nm":"Соучаствующее проектирование","n":"7","forr":"2.2, 2.4"},{"code":"СУББОТНИК","t":"Субботник / день древонасаждения на территории","need":"Дата проведения, фотоотчёт, список участников","nm":"Программа развития территории","n":"8","forr":"2.3, 2.4"}]}];
+const PAGE = {role:'adm', key:'city2'};
+const KEYS = ['city1','city2','city3','city4','city5','city6','city7','city8','city9','city10'];
 const ROOT = 'Общий диск «Среда» / Конкурс 2027 / ';
-const PAGES = {'Город 1':'city1', 'Город 2':'city2', 'Город 3':'city3', 'Город 4':'city4', 'Город 5':'city5', 'Город 6':'city6', 'Город 7':'city7', 'Город 8':'city8', 'Город 9':'city9', 'Город 10':'city10'};
-const ACCESS = {'Город 1':'1234', 'Город 2':'1234', 'Город 3':'1234', 'Город 4':'1234', 'Город 5':'1234', 'Город 6':'1234', 'Город 7':'1234', 'Город 8':'1234', 'Город 9':'1234', 'Город 10':'1234'};
-let PASS_CRD = '1234';
-let accOpen = false;
+const PASS = {crd:'1234', mgr:'1234', spec:'1234'};
 
-function renderAccess(){
-  if (ROLE !== 'crd'){ el('acc-box').innerHTML = ''; return; }
-  el('acc-box').innerHTML =
-    '<div class="tpl' + (accOpen ? ' open' : '') + '"><button class="tpl-h" id="acc-toggle" aria-expanded="' + accOpen + '">' +
-    'Доступы администраций<u>пароли выдаёте вы</u></button><div class="tpl-b"><ul>' +
-    CITIES.map(c =>
-      '<li><span class="tn">' + esc(c) + '<span>pbsreda.ru/' + PAGES[c] + '</span></span>' +
-      '<span class="ta"><input class="pw" data-acc="' + esc(c) + '" value="' + esc(ACCESS[c]) + '" aria-label="Пароль ' + esc(c) + '">' +
-      '<button class="btn" data-gen="' + esc(c) + '">Случайный</button>' +
-      '<button class="btn" data-copy="' + esc(c) + '">Скопировать доступ</button></span></li>').join('') +
-    '<li><span class="tn">Кабинет координатора<span>pbsreda.ru/coor</span></span>' +
-      '<span class="ta"><input class="pw" data-acc="crd" value="' + esc(PASS_CRD) + '" aria-label="Пароль координатора">' +
-      '<button class="btn" data-gen="crd">Случайный</button></span></li>' +
-    '</ul><p class="hint" style="margin:12px 0 0">Новый пароль действует сразу. Администрации сообщите его сами — вместе со ссылкой на страницу города.</p></div></div>';
-}
-const newPass = () => Math.random().toString(36).slice(2, 6) + '-' + Math.random().toString(36).slice(2, 6);
-
-const ST = {none:'Не загружено', part:'Загружено частично', sent:'На проверке', ok:'Принято', no:'Не предоставят'};
+const ST = {none:'Не загружено', sent:'На проверке', ok:'Принято'};
 const el = id => document.getElementById(id);
 const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const kb = n => n < 1048576 ? Math.max(1, Math.round(n/1024)) + ' КБ' : (n/1048576).toFixed(1) + ' МБ';
+const word = n => (n % 10 === 1 && n % 100 !== 11) ? 'документ'
+  : ((n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'документа' : 'документов');
 
-/* по одному набору запросов на каждую территорию */
+/* ---------- территории ---------- */
+const CITY = {};
+KEYS.forEach((k, i) => CITY[k] = {
+  name: 'Город ' + (i + 1), pass: '1234', landing: '', final: '', budget: '',
+  votes: 0, target: 0
+});
+
 const STATE = {};
-CITIES.forEach(c => {
-  STATE[c] = [];
-  DATA.forEach((s, si) => s.items.forEach(it => STATE[c].push(Object.assign({}, it, {
-    sec:si, secTitle:s.title, status:'none', files:[], fio:'', contact:'', note:'', deadline:'', back:''
+KEYS.forEach(k => {
+  STATE[k] = [];
+  DATA.forEach((s, si) => s.items.forEach(it => STATE[k].push(Object.assign({}, it, {
+    sec: si, secTitle: s.title, status: 'none', files: [], fio: '', contact: '',
+    note: '', deadline: '', back: '', done: false
   }))));
 });
-const PAGE = {role:'adm', city:'Город 2'};
-let CITY = PAGE.city, ROLE = PAGE.role, items = STATE[CITY], filter = 'all', query = '';
 
-/* шаблоны и примеры — файлы подгрузит координатор */
+let KEY = PAGE.key, ROLE = PAGE.role, items = STATE[KEY], filter = 'all', query = '';
+const info = () => CITY[KEY];
+const isCrd = () => ROLE === 'crd';
+const path = it => ROOT + info().name + ' / ' + it.secTitle + ' / ' + (it.n ? it.n + ' ' : '') + it.code;
+
+const ICON_FOLDER = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M1.5 3.5h4l1.2 1.6h7.8v7.4a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V3.5Z" stroke="#8A948C" stroke-width="1.2" stroke-linejoin="round"/></svg>';
+const ICON_FILE = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 1.5h5l3.2 3.2v9.8H4V1.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5v3.4h3.2" stroke="currentColor" stroke-width="1.2"/></svg>';
+
+/* ---------- шаблоны ---------- */
 const TPL = [
   {n:'Шаблон конкурсной заявки', d:'Структура разделов, как её принимает Минстрой', f:null},
   {n:'Пример заполненной заявки', d:'Заявка города-победителя целиком, для ориентира', f:null},
@@ -461,6 +422,7 @@ const TPL = [
   {n:'Пример исторической справки', d:'Объём и подача текста', f:null, code:'ИСТОРИЯ'}
 ];
 const tplFor = code => TPL.filter(t => t.code === code);
+let tplOpen = false, setOpen = false;
 
 function renderTpl(){
   const ready = TPL.filter(t => t.f).length;
@@ -469,50 +431,100 @@ function renderTpl(){
       'Шаблоны и примеры<u>' + (ready ? ready + ' из ' + TPL.length + ' готовы' : 'файлы добавит бюро') + '</u></button>' +
     '<div class="tpl-b"><ul>' + TPL.map((t, k) =>
       '<li><span class="fi">' + ICON_FILE + '</span><span class="tn">' + esc(t.n) + '<span>' + esc(t.d) + '</span></span>' +
-      '<span class="ta">' + (t.f
-        ? '<a href="#" data-tget="' + k + '">Скачать</a>'
-        : '<span class="soon">появится здесь</span>') +
-        (ROLE === 'crd' ? '<button class="btn" data-tput="' + k + '">' + (t.f ? 'Заменить' : 'Загрузить') + '</button>' : '') +
+      '<span class="ta">' + (t.f ? '<a href="#" data-tget="' + k + '">Скачать</a>' : '<span class="soon">появится здесь</span>') +
+        (isCrd() ? '<button class="btn" data-tput="' + k + '">' + (t.f ? 'Заменить' : 'Загрузить') + '</button>' : '') +
       '</span></li>').join('') + '</ul></div></div>';
 }
-let tplOpen = false;
 
-const path = it => ROOT + CITY + ' / ' + it.secTitle + ' / ' + (it.n ? it.n + ' ' : '') + it.code;
-const ICON_FOLDER = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M1.5 3.5h4l1.2 1.6h7.8v7.4a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V3.5Z" stroke="#8A948C" stroke-width="1.2" stroke-linejoin="round"/></svg>';
-const ICON_FILE = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 1.5h5l3.2 3.2v9.8H4V1.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5v3.4h3.2" stroke="currentColor" stroke-width="1.2"/></svg>';
+/* ---------- настройки территорий (куратор) ---------- */
+const newPass = () => Math.random().toString(36).slice(2, 6) + '-' + Math.random().toString(36).slice(2, 6);
+
+function renderSettings(){
+  if (!isCrd()){ el('set-box').innerHTML = ''; return; }
+  el('set-box').innerHTML =
+    '<div class="tpl' + (setOpen ? ' open' : '') + '"><button class="tpl-h" id="set-toggle" aria-expanded="' + setOpen + '">' +
+    'Территории, доступы и данные проекта<u>настраиваете вы</u></button><div class="tpl-b">' +
+    KEYS.map(k => {
+      const c = CITY[k];
+      return '<div class="cityset"><h4>' + esc(c.name) + ' · pbsreda.ru/' + k + '</h4><div class="g">' +
+        fld(k, 'name', 'Название территории', c.name) +
+        fld(k, 'pass', 'Пароль для администрации', c.pass) +
+        fld(k, 'budget', 'Бюджет проекта', c.budget, 'например 210 млн ₽') +
+        fld(k, 'landing', 'Ссылка на промежуточные результаты', c.landing, 'https://') +
+        fld(k, 'final', 'Ссылка на итоговый вариант', c.final, 'https://') +
+        '<div class="f"><label>Голосование: проголосовало / цель</label><div style="display:flex;gap:8px">' +
+          '<input data-set="' + k + '|votes" value="' + esc(String(c.votes)) + '" inputmode="numeric">' +
+          '<input data-set="' + k + '|target" value="' + esc(String(c.target)) + '" inputmode="numeric"></div></div>' +
+        '</div><div class="acts">' +
+        '<button class="btn" data-gen="' + k + '">Случайный пароль</button>' +
+        '<button class="btn" data-copy="' + k + '">Скопировать доступ</button>' +
+        '<span class="hint">Название меняется и на странице территории, и в списке при входе</span>' +
+        '</div></div>';
+    }).join('') +
+    '<p class="hint" style="margin:12px 0 0">Пароль кабинетов бюро: куратор, менеджер и специалист входят по своим паролям — их меняем на этапе подключения базы.</p>' +
+    '</div></div>';
+}
+function fld(k, key, label, val, ph){
+  return '<div class="f"><label>' + label + '</label><input data-set="' + k + '|' + key + '" value="' + esc(val) +
+    '" placeholder="' + esc(ph || '') + '"></div>';
+}
+
+/* ---------- инфоблок территории ---------- */
+function renderInfo(){
+  const c = info();
+  const pct = c.target > 0 ? Math.min(100, Math.round(c.votes / c.target * 100)) : 0;
+  el('info').innerHTML =
+    '<div class="ir"><b>Бюджет проекта</b><span>' + (c.budget ? esc(c.budget) : 'уточняется') + '</span></div>' +
+    '<div class="ir"><b>Промежуточные результаты</b><span>' +
+      (c.landing ? '<a href="' + esc(c.landing) + '" target="_blank" rel="noopener">открыть страницу проекта</a>' : 'ссылку добавит куратор') +
+    '</span></div>' +
+    '<div class="vote"><div class="vote-n"><b>' + c.votes.toLocaleString('ru-RU') + '</b>' +
+      '<span>проголосовало из ' + (c.target ? c.target.toLocaleString('ru-RU') + ' нужных' : 'цели, которую поставит куратор') + '</span></div>' +
+      '<div class="vbar"><i style="width:' + pct + '%"></i></div></div>' +
+    (c.final ? '<a class="btn btn-main fin" href="' + esc(c.final) + '" target="_blank" rel="noopener">Итоговый вариант заявки</a>' : '');
+}
 
 /* ---------- фильтры ---------- */
+function counts(){
+  const c = {none:0, sent:0, ok:0, done:0};
+  items.forEach(i => { c[i.status]++; if (i.done) c.done++; });
+  return c;
+}
 function chips(){
   const c = counts();
-  const set = ROLE === 'crd'
-    ? [['all','Все ' + items.length],['sent','На проверке ' + c.sent],['none','Не загружено ' + c.none],
-       ['part','Загружено частично ' + c.part],['no','Не предоставят ' + c.no],['ok','Принято ' + c.ok]]
-    : [['all','В работе ' + (items.length - c.ok)],['none','Не загружено ' + c.none],
-       ['part','Загружено частично ' + c.part],['sent','На проверке ' + c.sent],
-       ['no','Не предоставят ' + c.no],['ok','Принято ' + c.ok]];
+  let set;
+  if (ROLE === 'adm') set = [['all','В работе ' + (items.length - c.ok)], ['none','Не загружено ' + c.none],
+                             ['sent','На проверке ' + c.sent], ['ok','Принято ' + c.ok]];
+  else if (ROLE === 'crd') set = [['all','Все ' + items.length], ['sent','На проверке ' + c.sent],
+                                  ['none','Не загружено ' + c.none], ['ok','Принято ' + c.ok]];
+  else if (ROLE === 'spec') set = [['all','Все ' + items.length], ['ok','Документ принят ' + c.ok],
+                                   ['none','Ждём документ ' + c.none], ['done','Выполнено ' + c.done]];
+  else set = [['all','Все ' + items.length], ['ok','Принято ' + c.ok], ['sent','На проверке ' + c.sent],
+              ['none','Не загружено ' + c.none]];
   el('chips').innerHTML = set.map(([f, t]) =>
     '<button class="chip" data-f="' + f + '" aria-pressed="' + (filter === f) + '">' + t + '</button>').join('') +
     '<div class="search"><input id="q" type="search" value="' + esc(query) + '" placeholder="Поиск по запросам" aria-label="Поиск"></div>';
 }
 
-function counts(){
-  const c = {none:0, part:0, sent:0, ok:0, no:0};
-  items.forEach(i => c[i.status]++);
-  return c;
+/* ---------- список ---------- */
+function sub(it){
+  const p = [];
+  if (it.nm) p.push(esc(it.nm));
+  if (it.forr) p.push('нужно в разделах заявки ' + esc(it.forr));
+  if (it.deadline) p.push('срок ' + esc(it.deadline.split('-').reverse().join('.')));
+  return p.length ? '<p>' + p.join(' · ') + '</p>' : '';
 }
 
-/* ---------- список ---------- */
 function render(){
   const q = query.trim().toLowerCase();
   let html = '', shown = 0;
-
   DATA.forEach((s, si) => {
     const own = items.filter(i => i.sec === si);
-    let vis = own.filter(i => (!q || (i.code + ' ' + i.t + ' ' + i.need + ' ' + i.n + ' ' + (i.nm || '')).toLowerCase().includes(q)));
-    vis = filter === 'all'
-      ? (ROLE === 'adm' ? vis.filter(i => i.status !== 'ok') : vis)
-      : vis.filter(i => i.status === filter);
-    const hidden = ROLE === 'adm' && filter === 'all' ? own.filter(i => i.status === 'ok').length : 0;
+    let vis = own.filter(i => !q || (i.code + ' ' + i.t + ' ' + i.need + ' ' + (i.nm || '')).toLowerCase().includes(q));
+    if (filter === 'done') vis = vis.filter(i => i.done);
+    else if (filter !== 'all') vis = vis.filter(i => i.status === filter);
+    else if (ROLE === 'adm') vis = vis.filter(i => i.status !== 'ok');
+    const hidden = (ROLE === 'adm' && filter === 'all') ? own.filter(i => i.status === 'ok').length : 0;
     if (!vis.length && !hidden) return;
     shown += vis.length;
     const ok = own.filter(i => i.status === 'ok').length;
@@ -523,79 +535,76 @@ function render(){
     vis.forEach(it => html += row(it));
     html += '</section>';
   });
-
-  renderTpl(); renderAccess();
+  renderTpl(); renderSettings(); renderInfo();
   el('list').innerHTML = html;
   el('empty').hidden = shown > 0;
   stats();
 }
-const word = n => (n % 10 === 1 && n % 100 !== 11) ? 'документ' : ((n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'документа' : 'документов');
-
-function sub(it){
-  const p = [];
-  if (it.nm) p.push(esc(it.nm));
-  if (it.also) p.push('также в разделе ' + esc(it.also));
-  if (it.deadline) p.push('срок ' + esc(it.deadline.split('-').reverse().join('.')));
-  return p.length ? '<p>' + p.join(' · ') + '</p>' : '';
-}
 
 function row(it){
   const i = items.indexOf(it);
-  const crd = ROLE === 'crd';
-  const files = it.files.map((fl, k) =>
+  const seeFiles = ROLE === 'adm' || isCrd() || it.status === 'ok';
+  const files = seeFiles ? it.files.map((fl, k) =>
     '<li><span class="fi">' + ICON_FILE + '</span><span class="fn">' + esc(fl.name) + '</span><span class="fs">' + kb(fl.size) + '</span>' +
-    (crd || it.status === 'ok' ? '' : '<button data-del="' + i + '_' + k + '" aria-label="Убрать файл">×</button>') + '</li>').join('');
+    (isCrd() ? '<button data-del="' + i + '_' + k + '" aria-label="Удалить файл">×</button>' : '') + '</li>').join('') : '';
 
   let acts = '';
-  if (crd){
+  if (isCrd()){
     acts = '<div class="acts">' +
-      '<button class="btn btn-main" data-accept="' + i + '"' + (it.status === 'sent' || it.status === 'part' ? '' : ' disabled') + '>Принять документ</button>' +
-      '<button class="btn" data-back="' + i + '">Вернуть на доработку</button>' +
-      (it.status === 'ok' ? '<button class="btn" data-unaccept="' + i + '">Отменить приём</button>' : '') +
-      '<span class="hint">Принятое уходит из списка администрации</span></div>';
-  } else if (it.status !== 'ok'){
+      '<button class="btn btn-main" data-ok="' + i + '"' + (it.status === 'sent' ? '' : ' disabled') + '>Одобрить</button>' +
+      (it.status === 'ok' ? '<button class="btn" data-unok="' + i + '">Отменить приём</button>'
+                          : '<button class="btn" data-back="' + i + '">Вернуть на доработку</button>') +
+      '<span class="hint">Одобренное уходит из списка территории и становится видно бюро</span></div>';
+  } else if (ROLE === 'adm' && it.status !== 'ok'){
+    acts = '<div class="acts"><span class="hint">Файл уходит на проверку сразу после загрузки. ' +
+      'Заменить или удалить его может куратор бюро.</span></div>';
+  } else if (ROLE === 'spec'){
     acts = '<div class="acts">' +
-      '<button class="btn btn-main" data-send="' + i + '"' + (it.files.length ? '' : ' disabled') + '>Отправить в бюро</button>' +
-      '<button class="btn btn-no" data-no="' + i + '">Не сможем предоставить</button>' +
-      '<span class="hint">Файлы уходят на диск сразу, бюро проверит и подтвердит приём</span></div>';
+      '<button class="btn' + (it.done ? '' : ' btn-main') + '" data-done="' + i + '">' +
+        (it.done ? 'Снять отметку' : 'Отметить выполнение') + '</button>' +
+      '<span class="hint">Отметка видна куратору и менеджерам</span></div>';
   }
 
-  const fields = crd
-    ? '<div class="grid2"><div class="f"><label for="dl' + i + '">Срок для администрации</label>' +
+  let fields = '';
+  if (ROLE === 'adm'){
+    fields = '<div class="grid2">' +
+      '<div class="f"><label for="fio' + i + '">Кто отвечает за документ</label>' +
+        '<input id="fio' + i + '" data-fio="' + i + '" value="' + esc(it.fio) + '" placeholder="ФИО и должность"></div>' +
+      '<div class="f"><label for="c' + i + '">Телефон и почта</label>' +
+        '<input id="c' + i + '" data-contact="' + i + '" value="' + esc(it.contact) + '" placeholder="+7 ··· · почта"></div></div>' +
+      '<div class="f" style="margin-top:12px"><label for="nt' + i + '">Комментарий для куратора</label>' +
+        '<textarea id="nt' + i + '" data-note="' + i + '" placeholder="Например: топосъёмка 2019 года, заказали обновление, будет к 20 числу">' + esc(it.note) + '</textarea></div>';
+  } else if (isCrd()){
+    fields = '<div class="grid2"><div class="f"><label for="dl' + i + '">Срок для территории</label>' +
         '<input id="dl' + i + '" type="date" data-dl="' + i + '" value="' + esc(it.deadline) + '"></div>' +
-      '<div class="f"><label>Ответственный от администрации</label>' +
-        '<input value="' + esc(it.fio || '—') + '" readonly></div></div>' +
+      '<div class="f"><label>Ответственный от администрации</label><input value="' + esc(it.fio || '—') + '" readonly></div></div>' +
       (it.note ? '<div class="msg"><b>Комментарий администрации:</b> ' + esc(it.note) + '</div>' : '') +
       '<div class="f" style="margin-top:12px"><label for="bk' + i + '">Что не так — увидит администрация</label>' +
-        '<textarea id="bk' + i + '" data-backtext="' + i + '" placeholder="Например: нужна топосъёмка не старше трёх лет">' + esc(it.back) + '</textarea></div>'
-    : '<div class="grid2">' +
-        '<div class="f"><label for="fio' + i + '">Кто отвечает за документ</label>' +
-          '<input id="fio' + i + '" data-fio="' + i + '" value="' + esc(it.fio) + '" placeholder="ФИО и должность"></div>' +
-        '<div class="f"><label for="c' + i + '">Телефон и почта</label>' +
-          '<input id="c' + i + '" data-contact="' + i + '" value="' + esc(it.contact) + '" placeholder="+7 ··· · почта"></div></div>' +
-      '<div class="f" style="margin-top:12px"><label for="nt' + i + '">Комментарий для координатора</label>' +
-        '<textarea id="nt' + i + '" data-note="' + i + '" placeholder="Например: топосъёмка 2019 года, заказали обновление, будет к 20 числу">' + esc(it.note) + '</textarea></div>';
+        '<textarea id="bk' + i + '" data-backtext="' + i + '" placeholder="Например: нужна топосъёмка не старше трёх лет">' + esc(it.back) + '</textarea></div>';
+  }
 
   return '<div class="row s-' + it.status + '" id="i' + i + '" data-i="' + i + '">' +
     '<button class="row-h" data-open="' + i + '" aria-expanded="false">' +
       '<span class="rn">' + esc(it.n || '—') + '</span>' +
-      '<span class="rt"><b><i>' + esc(it.code) + '</i> · ' + esc(it.t) + '</b>' +
-        sub(it) + '</span>' +
-      '<span class="st">' + ST[it.status] + (it.files.length ? ' · ' + it.files.length : '') + '</span>' +
+      '<span class="rt"><b><i>' + esc(it.code) + '</i> · ' + esc(it.t) + '</b>' + sub(it) + '</span>' +
+      '<span class="st">' + ST[it.status] + (seeFiles && it.files.length ? ' · ' + it.files.length : '') + '</span>' +
+      (it.done ? '<span class="done-tag">выполнено</span>' : '') +
     '</button>' +
     '<div class="body">' +
       '<div class="req"><em>Что должно лечь в папку:</em><span>' + esc(it.need || '—') + '</span></div>' +
       tplFor(it.code).map(t => '<div class="rowtpl">' + ICON_FILE + '<em>' + esc(t.n) + '</em><span class="ta">' +
         (t.f ? '<a href="#" data-tget="' + TPL.indexOf(t) + '">Скачать</a>' : '<span class="soon">появится здесь</span>') +
         '</span></div>').join('') +
-      '<div class="path">' + ICON_FOLDER + '<span>' + esc(ROOT + CITY + ' / ' + it.secTitle + ' / ') +
+      '<div class="path">' + ICON_FOLDER + '<span>' + esc(ROOT + info().name + ' / ' + it.secTitle + ' / ') +
         '<b>' + esc((it.n ? it.n + ' ' : '') + it.code) + '</b></span>' +
-        '<a href="#" data-drive="' + i + '">Открыть папку</a></div>' +
-      (it.back && !crd ? '<div class="msg back"><b>Бюро вернуло на доработку:</b> ' + esc(it.back) + '</div>' : '') +
-      (it.status === 'ok' ? '<div class="msg ok"><b>Документ принят бюро.</b> Ничего делать не нужно.</div>' :
-        '<div class="drop" data-drop="' + i + '" tabindex="0" role="button">' +
-        '<p><b>Выберите файл</b> или перетащите его сюда</p>' +
-        '<small>PDF, DWG, XLSX, JPG. До 200 МБ на файл</small></div>') +
+        (ROLE === 'adm' ? '' : '<a href="#" data-drive="' + i + '">Открыть папку</a>') + '</div>' +
+      (it.back && ROLE === 'adm' ? '<div class="msg back"><b>Бюро вернуло на доработку:</b> ' + esc(it.back) + '</div>' : '') +
+      (ROLE === 'adm'
+        ? (it.status === 'ok' ? '<div class="msg ok"><b>Документ принят бюро.</b> Ничего делать не нужно.</div>'
+            : '<div class="drop" data-drop="' + i + '" tabindex="0" role="button">' +
+              '<p><b>Выберите файл</b> или перетащите его сюда</p>' +
+              '<small>PDF, DWG, XLSX, JPG. До 200 МБ на файл</small></div>')
+        : (seeFiles ? '' : '<div class="msg"><b>Файлы на проверке у куратора.</b> Они появятся здесь после одобрения.</div>')) +
       (files ? '<ul class="files">' + files + '</ul>' : '') +
       fields + acts +
     '</div></div>';
@@ -604,17 +613,14 @@ function row(it){
 /* ---------- сводка ---------- */
 function stats(){
   const c = counts();
-  el('n-ok').textContent = c.ok;
-  el('n-sent').textContent = c.sent;
-  el('n-no').textContent = c.no;
-  el('n-left').textContent = c.none + c.part;
-  el('f-count').textContent = ROLE === 'crd'
+  el('f-count').textContent = isCrd()
     ? 'Принято ' + c.ok + ' из ' + items.length + ' · на проверке ' + c.sent
+    : ROLE === 'spec' ? 'Выполнено ' + c.done + ' из ' + items.length + ' · документов принято ' + c.ok
     : 'Принято бюро ' + c.ok + ' из ' + items.length;
-  el('f-bar').style.width = Math.round(c.ok / items.length * 100) + '%';
-  el('f-hint').textContent = ROLE === 'crd'
-    ? 'Вы видите все территории — переключайте в шапке'
-    : (c.sent ? 'Бюро проверяет ' + c.sent + ' — статус изменится после подтверждения' : 'Отправленное проверит координатор бюро');
+  el('f-bar').style.width = Math.round((ROLE === 'spec' ? c.done : c.ok) / items.length * 100) + '%';
+  el('f-hint').textContent = isCrd() ? 'Вы видите все территории — переключайте в шапке'
+    : ROLE === 'adm' ? (c.sent ? 'Куратор проверяет ' + c.sent + ' — статус изменится после одобрения' : 'Загруженное проверит куратор бюро')
+    : 'Видны документы, одобренные куратором';
 
   el('tally').innerHTML = items.map((it, i) =>
     '<button class="tick ' + (it.status === 'none' ? '' : it.status) + '" data-go="' + i + '" title="' +
@@ -624,71 +630,59 @@ function stats(){
     const own = items.filter(i => i.sec === si);
     const d = own.filter(i => i.status === 'ok').length;
     return '<a href="#" data-sec="' + si + '" class="' + (d === own.length ? 'full' : '') + '"><b>' + (si + 1) + '</b><span>' +
-      esc(s.title.replace(/^\d+\.\s*/, '')) + '</span><u>' + d + '/' + own.length + '</u></a>';
+      esc(s.title) + '</span><u>' + d + '/' + own.length + '</u></a>';
   }).join('');
 
-  el('rail-note').innerHTML = ROLE === 'crd'
-    ? '<b>Кабинет координатора</b>Проверьте отправленное и подтвердите приём. После подтверждения запрос уходит из списка администрации, и его перестают догружать.'
-    : '<b>Как это работает</b>Файл попадает сразу в нужную папку общего Google Диска. Бюро проверяет и подтверждает приём — принятые запросы уходят из списка.';
+  el('rail-note').innerHTML = isCrd()
+    ? '<b>Кабинет куратора</b>Проверьте загруженное и нажмите «Одобрить». До одобрения файлы не видит никто, кроме вас. После — запрос уходит из списка территории.'
+    : ROLE === 'adm' ? '<b>Как это работает</b>Файл сразу попадает в нужную папку общего диска и уходит на проверку. Куратор бюро одобряет приём, после этого запрос уходит из списка.'
+    : ROLE === 'spec' ? '<b>Кабинет специалиста</b>Здесь видно, какие документы уже пришли и к какому сроку, и можно отметить, что ваша часть готова.'
+    : '<b>Кабинет менеджера</b>Полная картина по территориям: что принято, что на проверке, чего ещё ждём.';
 }
 
 /* ---------- действия ---------- */
 function toast(t){ const x = el('toast'); x.textContent = t; x.classList.add('on'); clearTimeout(x._t); x._t = setTimeout(() => x.classList.remove('on'), 3000); }
-function reopen(i){ const r = document.getElementById('i' + i); if (r){ r.classList.add('open'); r.querySelector('.row-h').setAttribute('aria-expanded','true'); } }
-function open(i){
-  const r = document.getElementById('i' + i); if (!r) return;
+function reopen(i){ const r = el('i' + i); if (r){ r.classList.add('open'); r.querySelector('.row-h').setAttribute('aria-expanded','true'); } }
+function openRow(i){
+  const r = el('i' + i); if (!r) return;
   const was = r.classList.contains('open');
   document.querySelectorAll('.row.open').forEach(x => { x.classList.remove('open'); x.querySelector('.row-h').setAttribute('aria-expanded','false'); });
   if (!was) reopen(i);
 }
 function addFiles(i, list){
   [...list].forEach(f => items[i].files.push({name:f.name, size:f.size}));
-  items[i].status = 'part'; items[i].back = '';
+  items[i].status = 'sent'; items[i].back = '';
   chips(); render(); reopen(i);
-  toast('Файл прикреплён. Нажмите «Отправить в бюро», когда всё соберёте');
+  toast('Файл загружен и ушёл на проверку куратору');
 }
 
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-sec],#tpl-toggle,#acc-toggle,[data-gen],[data-copy],[data-tget],[data-tput],[data-open],[data-send],[data-no],[data-del],[data-go],[data-drive],[data-drop],[data-accept],[data-back],[data-unaccept],.chip');
+  const t = e.target.closest('[data-sec],#tpl-toggle,#set-toggle,[data-gen],[data-copy],[data-tget],[data-tput],' +
+    '[data-open],[data-del],[data-go],[data-drive],[data-drop],[data-ok],[data-unok],[data-back],[data-done],.chip');
   if (!t) return;
   const d = t.dataset;
 
-  if (d.sec !== undefined){
-    e.preventDefault();
-    const s = document.getElementById('sec' + d.sec);
-    if (s) s.scrollIntoView({behavior:'smooth', block:'start'});
-    return;
-  }
+  if (d.sec !== undefined){ e.preventDefault(); const s = el('sec' + d.sec); if (s) s.scrollIntoView({behavior:'smooth', block:'start'}); return; }
   if (t.id === 'tpl-toggle'){ tplOpen = !tplOpen; renderTpl(); return; }
-  if (t.id === 'acc-toggle'){ accOpen = !accOpen; renderAccess(); return; }
-  if (d.gen !== undefined){
-    const p = newPass();
-    if (d.gen === 'crd') PASS_CRD = p; else ACCESS[d.gen] = p;
-    renderAccess(); toast('Новый пароль: ' + p); return;
-  }
-  if (d.copy !== undefined){
-    const c = d.copy, txt = 'Страница: pbsreda.ru/' + PAGES[c] + '  ·  Пароль: ' + ACCESS[c];
-    try { navigator.clipboard.writeText(txt); } catch (err) {}
-    toast('Скопировано: ' + txt); return;
-  }
-  if (d.tget !== undefined){ e.preventDefault(); toast('Скачивание: ' + TPL[+d.tget].n); return; }
-  if (d.tput !== undefined){
-    const k = +d.tput, inp = document.createElement('input'); inp.type = 'file';
-    inp.onchange = () => { if (!inp.files.length) return; TPL[k].f = inp.files[0].name; renderTpl();
-      toast('Шаблон загружен — администрации он виден сразу'); };
-    inp.click(); return;
-  }
+  if (t.id === 'set-toggle'){ setOpen = !setOpen; renderSettings(); return; }
   if (t.classList.contains('chip')){ filter = d.f; chips(); render(); return; }
-  if (d.open !== undefined) return open(+d.open);
+  if (d.open !== undefined) return openRow(+d.open);
+
   if (d.go !== undefined){
     const i = +d.go;
     if (filter !== 'all'){ filter = 'all'; chips(); render(); }
-    setTimeout(() => { const r = document.getElementById('i' + i);
+    setTimeout(() => { const r = el('i' + i);
       if (!r){ toast(items[i].code + ' — принято бюро, откройте фильтр «Принято»'); return; }
-      r.scrollIntoView({block:'center', behavior:'smooth'}); open(i); }, 30);
+      r.scrollIntoView({block:'center', behavior:'smooth'}); openRow(i); }, 30);
     return;
   }
-  if (d.drive !== undefined){ e.preventDefault(); toast('Папка на Google Диске: ' + path(items[+d.drive])); return; }
+  if (d.drive !== undefined){ e.preventDefault(); toast('Папка на диске: ' + path(items[+d.drive])); return; }
+  if (d.tget !== undefined){ e.preventDefault(); toast('Скачивание: ' + TPL[+d.tget].n); return; }
+  if (d.tput !== undefined){
+    const k = +d.tput, inp = document.createElement('input'); inp.type = 'file';
+    inp.onchange = () => { if (!inp.files.length) return; TPL[k].f = inp.files[0].name; renderTpl(); toast('Шаблон загружен — территориям он виден сразу'); };
+    inp.click(); return;
+  }
   if (d.drop !== undefined){
     const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true;
     inp.onchange = () => inp.files.length && addFiles(+d.drop, inp.files); inp.click(); return;
@@ -697,30 +691,25 @@ document.addEventListener('click', e => {
     const [i, k] = d.del.split('_').map(Number);
     items[i].files.splice(k, 1);
     if (!items[i].files.length) items[i].status = 'none';
-    chips(); render(); reopen(i); return;
+    chips(); render(); reopen(i); toast('Файл удалён'); return;
   }
-  if (d.send !== undefined){
-    const i = +d.send; if (!items[i].files.length) return;
-    items[i].status = 'sent'; items[i].back = '';
-    chips(); render(); reopen(i);
-    toast('Отправлено в бюро: ' + items[i].code + '. Ждёт подтверждения координатора'); return;
+  if (d.ok !== undefined){
+    const i = +d.ok; items[i].status = 'ok'; items[i].back = '';
+    chips(); render(); toast('Принято: ' + items[i].code + '. У территории запрос убран из списка'); return;
   }
-  if (d.no !== undefined){
-    const i = +d.no;
-    if (!items[i].note.trim()){ toast('Напишите в комментарии, почему документа не будет'); el('nt' + i).focus(); return; }
-    items[i].status = 'no'; chips(); render(); reopen(i); toast('Координатор увидит это в сводке'); return;
-  }
-  if (d.accept !== undefined){
-    const i = +d.accept; items[i].status = 'ok'; items[i].back = '';
-    chips(); render(); toast('Принято: ' + items[i].code + '. У администрации запрос убран из списка'); return;
-  }
-  if (d.unaccept !== undefined){
-    const i = +d.unaccept; items[i].status = 'sent'; chips(); render(); reopen(i); return;
-  }
+  if (d.unok !== undefined){ const i = +d.unok; items[i].status = 'sent'; chips(); render(); reopen(i); return; }
   if (d.back !== undefined){
     const i = +d.back;
     if (!items[i].back.trim()){ toast('Напишите, что нужно исправить — администрация увидит текст'); el('bk' + i).focus(); return; }
-    items[i].status = 'part'; chips(); render(); reopen(i); toast('Возвращено на доработку'); return;
+    items[i].status = 'none'; items[i].files = [];
+    chips(); render(); reopen(i); toast('Возвращено на доработку'); return;
+  }
+  if (d.done !== undefined){ const i = +d.done; items[i].done = !items[i].done; chips(); render(); reopen(i); return; }
+  if (d.gen !== undefined){ CITY[d.gen].pass = newPass(); renderSettings(); toast('Новый пароль: ' + CITY[d.gen].pass); return; }
+  if (d.copy !== undefined){
+    const k = d.copy, txt = 'Страница: pbsreda.ru/' + k + '  ·  Пароль: ' + CITY[k].pass;
+    try { navigator.clipboard.writeText(txt); } catch (err) {}
+    toast('Скопировано: ' + txt); return;
   }
 });
 
@@ -731,7 +720,12 @@ document.addEventListener('input', e => {
   else if (d.note !== undefined) items[+d.note].note = e.target.value;
   else if (d.backtext !== undefined) items[+d.backtext].back = e.target.value;
   else if (d.dl !== undefined) items[+d.dl].deadline = e.target.value;
-  else if (d.acc !== undefined){ if (d.acc === 'crd') PASS_CRD = e.target.value; else ACCESS[d.acc] = e.target.value; }
+  else if (d.set !== undefined){
+    const [k, key] = d.set.split('|');
+    CITY[k][key] = (key === 'votes' || key === 'target') ? (parseInt(e.target.value.replace(/\D/g,''), 10) || 0) : e.target.value;
+    if (key === 'name'){ fillCities(); if (k === KEY) el('hero-city').textContent = CITY[k].name; }
+    renderInfo();
+  }
   else if (e.target.id === 'q'){ query = e.target.value; render(); }
 });
 
@@ -746,41 +740,49 @@ document.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('drop')){ e.preventDefault(); e.target.click(); }
 });
 
+/* ---------- территории в списках ---------- */
+function fillCities(){
+  const opts = KEYS.map(k => '<option value="' + k + '">' + esc(CITY[k].name) + '</option>').join('');
+  el('city').innerHTML = opts; el('city').value = KEY;
+  el('g-city').innerHTML = opts; el('g-city').value = KEY;
+}
 el('city').onchange = () => {
-  if (ROLE !== 'crd'){ el('city').value = CITY; toast('Администрация видит только свою территорию'); return; }
-  location.hash = encodeURIComponent(el('city').value);
+  if (ROLE === 'adm'){ el('city').value = KEY; toast('Администрация видит только свою территорию'); return; }
+  KEY = el('city').value; items = STATE[KEY];
+  location.hash = KEY;
+  applyRole();
 };
-el('f-report').onclick = () => toast('Опись выгрузится в XLSX — тот же файл, что ведёт координатор');
 
-/* ---------- роль и территория ---------- */
+el('f-report').onclick = () => toast('Опись выгрузится в XLSX — тот же файл, что ведёт куратор');
 
+/* ---------- роль ---------- */
+const ROLE_NAME = {adm:'Администрация', crd:'Куратор бюро', mgr:'Менеджер бюро', spec:'Специалист бюро'};
 function applyRole(){
-  items = STATE[CITY];
-  document.body.classList.toggle('crd', ROLE === 'crd');
-  el('city').value = CITY;
-  el('hero-city').textContent = CITY;
-  el('role-tag').textContent = ROLE === 'crd' ? 'Координатор бюро' : 'Администрация';
-  el('hero-sub').innerHTML = ROLE === 'crd'
-    ? 'Кулиджанова Нана · проверка и приём документов по всем территориям'
-    : 'Координатор бюро — Кулиджанова Нана · <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>';
-  document.title = CITY + ' — сбор документов заявки';
+  items = STATE[KEY];
+  document.body.classList.toggle('crd', isCrd());
+  el('city-pick').hidden = ROLE === 'adm';
+  fillCities();
+  el('hero-city').textContent = info().name;
+  el('role-tag').textContent = ROLE_NAME[ROLE];
+  el('hero-sub').textContent = ROLE === 'adm'
+    ? 'Куратор бюро — Кулиджанова Нана'
+    : 'Проектное бюро «Среда» · ' + ROLE_NAME[ROLE];
+  document.title = info().name + ' — сбор документов заявки';
   filter = 'all'; query = ''; chips(); render();
 }
 
-if (ROLE === 'crd'){
+if (ROLE !== 'adm'){
   const hs = decodeURIComponent(location.hash.slice(1));
-  if (CITIES.includes(hs)) CITY = hs;
+  if (KEYS.includes(hs)) KEY = hs;
   window.addEventListener('hashchange', () => {
-    const c = decodeURIComponent(location.hash.slice(1));
-    if (CITIES.includes(c) && c !== CITY && el('gate').hidden){ CITY = c; applyRole(); }
+    const k = decodeURIComponent(location.hash.slice(1));
+    if (KEYS.includes(k) && k !== KEY && el('gate').hidden){ KEY = k; applyRole(); }
   });
 }
 applyRole();
 
-/* ---------- выход и вход заново ---------- */
-const PASS_SPEC = '1234';
+/* ---------- вход и выход ---------- */
 let TAB = 'adm';
-
 function setTab(r){
   TAB = r;
   el('tab-adm').setAttribute('aria-selected', r === 'adm');
@@ -788,31 +790,30 @@ function setTab(r){
   el('g-city-f').hidden = r !== 'adm';
   el('b-role-f').hidden = r !== 'bur';
   el('g-sub').textContent = r === 'bur'
-    ? 'Кабинеты бюро: приём документов у координатора, сроки по материалам у специалиста.'
-    : 'Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт координатор бюро.';
+    ? 'Кабинеты бюро: куратор принимает документы, менеджер видит картину целиком, специалист — сроки по своим материалам.'
+    : 'Раздел для администраций городов, с которыми бюро готовит заявку.';
   el('g-err').textContent = '';
 }
 el('tab-adm').onclick = () => setTab('adm');
 el('tab-bur').onclick = () => setTab('bur');
 
+function go(page){
+  try { location.href = page + '.html'; } catch (err) {}
+  setTimeout(() => { el('g-err').textContent = 'Страница /' + page + ' не открылась — откройте файл вручную'; }, 1200);
+}
 function enter(){
   const p = el('g-pass').value.trim();
   if (!p){ el('g-err').textContent = 'Введите пароль'; el('g-pass').focus(); return; }
   if (TAB === 'adm'){
-    const c = el('g-city').value;
-    if (p !== ACCESS[c]){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
-    if (c === CITY && ROLE === 'adm' && CITIES.includes(c)){ hideGate(); return; }
-    go(PAGES[c]);
-    return;
+    const k = el('g-city').value;
+    if (p !== CITY[k].pass){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
+    if (k === KEY && ROLE === 'adm'){ hideGate(); return; }
+    go(k); return;
   }
   const r = el('b-role').value;
-  if (p !== (r === 'crd' ? PASS_CRD : PASS_SPEC)){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
-  if (r === 'crd' && ROLE === 'crd'){ hideGate(); return; }
-  go(r === 'crd' ? 'coor' : 'spec');
-}
-function go(page){
-  try { location.href = page + '.html'; } catch (err) {}
-  setTimeout(() => { el('g-err').textContent = 'Страница /' + page + ' не открылась — откройте файл вручную'; }, 1200);
+  if (p !== PASS[r]){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
+  if (r === ROLE){ hideGate(); return; }
+  go(r === 'crd' ? 'cur' : r === 'mgr' ? 'man' : 'spec');
 }
 function hideGate(){
   el('gate').hidden = true;
@@ -827,14 +828,14 @@ el('logout').onclick = () => {
   try { location.href = 'index.html'; } catch (err) {}
   setTimeout(showGate, 400);
 };
-
-showGate();
-
 function showGate(){
   el('g-pass').value = ''; el('g-err').textContent = '';
-  el('g-city').value = CITIES.includes(CITY) ? CITY : CITIES[0];
-  el('b-role').value = 'crd';
-  setTab(ROLE === 'crd' ? 'bur' : 'adm');
+  fillCities();
+  el('b-role').value = ROLE === 'adm' ? 'crd' : ROLE;
+  setTab(ROLE === 'adm' ? 'adm' : 'bur');
+  el('g-sub').textContent = ROLE === 'adm'
+    ? 'Страница территории «' + info().name + '». Введите пароль, который выдал куратор бюро.'
+    : 'Кабинет: ' + ROLE_NAME[ROLE] + '. Введите пароль.';
   document.body.classList.remove('crd');
   el('gate').hidden = false;
   document.body.classList.add('locked');
@@ -842,6 +843,7 @@ function showGate(){
   window.scrollTo(0, 0);
   el('g-pass').focus();
 }
+showGate();
 </script>
 </body>
 </html>
