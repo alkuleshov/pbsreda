@@ -26,7 +26,7 @@
   --red-pale:#FBEDEB;
   --r:3px;
 }
-/* фиолетово-розовая тема кабинета координатора */
+/* фиолетово-розовая тема кабинета куратора */
 body.crd{
   --green:#8B2FC7;
   --green-dark:#6E1FA3;
@@ -294,18 +294,7 @@ body.locked{overflow:hidden}
         <p class="sub" id="g-sub">Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт куратор бюро.</p>
         <div class="f" id="g-city-f">
           <label for="g-city">Территория</label>
-          <select id="g-city">
-            <option>Город 1</option>
-            <option>Город 2</option>
-            <option>Город 3</option>
-            <option>Город 4</option>
-            <option>Город 5</option>
-            <option>Город 6</option>
-            <option>Город 7</option>
-            <option>Город 8</option>
-            <option>Город 9</option>
-            <option>Город 10</option>
-          </select>
+          <select id="g-city"></select>
         </div>
         <div class="f" id="b-role-f" hidden>
           <label for="b-role">Кабинет</label>
@@ -352,10 +341,19 @@ body.locked{overflow:hidden}
 
 <script>
 const el = id => document.getElementById(id);
-const PAGES = {'Город 1':'city1', 'Город 2':'city2', 'Город 3':'city3', 'Город 4':'city4', 'Город 5':'city5', 'Город 6':'city6', 'Город 7':'city7', 'Город 8':'city8', 'Город 9':'city9', 'Город 10':'city10'};
-const ACCESS = {'Город 1':'1234', 'Город 2':'1234', 'Город 3':'1234', 'Город 4':'1234', 'Город 5':'1234', 'Город 6':'1234', 'Город 7':'1234', 'Город 8':'1234', 'Город 9':'1234', 'Город 10':'1234'};
+const KEYS = ['city1','city2','city3','city4','city5','city6','city7','city8','city9','city10'];
+const CITY = {};
+KEYS.forEach((k, i) => CITY[k] = {name:'Город ' + (i + 1), pass:'1234'});
+try {
+  const raw = localStorage.getItem('pbsreda-cities-v1');
+  if (raw){ const o = JSON.parse(raw); KEYS.forEach(k => { if (o[k]) Object.assign(CITY[k], o[k]); }); }
+} catch (e) {}
+
 const PASS_BUR = {crd:'1234', mgr:'1234', spec:'1234'};
 let TAB = 'adm';
+
+el('g-city').innerHTML = KEYS.map(k =>
+  '<option value="' + k + '">' + CITY[k].name.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) + '</option>').join('');
 
 function setTab(r){
   TAB = r;
@@ -368,17 +366,13 @@ function setTab(r){
     : 'Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт куратор бюро.';
   el('g-err').textContent = '';
 }
-el('tab-adm').onclick = () => setTab('adm');
-el('tab-bur').onclick = () => setTab('bur');
-
 function enter(){
   const p = el('g-pass').value.trim();
   if (!p){ el('g-err').textContent = 'Введите пароль'; el('g-pass').focus(); return; }
   let target, need;
   if (TAB === 'adm'){
-    const c = el('g-city').value;
-    need = ACCESS[c];
-    target = PAGES[c] + '.html';
+    const k = el('g-city').value;
+    need = CITY[k].pass; target = k + '.html';
   } else {
     const r = el('b-role').value;
     need = PASS_BUR[r];
@@ -390,12 +384,14 @@ function enter(){
 }
 el('g-go').onclick = enter;
 el('g-pass').onkeydown = e => { if (e.key === 'Enter') enter(); };
+el('tab-adm').onclick = () => setTab('adm');
+el('tab-bur').onclick = () => setTab('bur');
 
 el('req-open').onclick = () => { el('req-form').hidden = false; el('req-open').disabled = true; el('r-city').focus(); };
 el('req-cancel').onclick = () => { el('req-form').hidden = true; el('req-open').disabled = false; el('req-msg').textContent = ''; };
 el('req-send').onclick = () => {
   const city = el('r-city').value.trim(), contact = el('r-contact').value.trim();
-  if (!city || !contact){ el('req-msg').textContent = 'Заполните территорию и контакты — по ним свяжется координатор'; return; }
+  if (!city || !contact){ el('req-msg').textContent = 'Заполните территорию и контакты — по ним свяжется куратор'; return; }
   el('req-form').innerHTML = '<p style="margin:0;font-size:14px"><b>Заявка отправлена.</b> Куратор бюро свяжется в течение рабочего дня. ' +
     'Если нужно быстрее — <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>.</p>';
 };

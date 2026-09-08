@@ -85,6 +85,8 @@ body.locked{overflow:hidden}
 .top-title span{display:block;font-weight:400;font-size:13px;color:var(--ink-2)}
 .top-right{margin-left:auto;display:flex;align-items:center;gap:14px}
 .top-right .btn{padding:6px 12px;font-size:13px}
+.btn-exit{color:var(--red);border-color:#EBC9C4;font-weight:500}
+.btn-exit:hover{background:var(--red-pale);border-color:var(--red);color:#fff;background:var(--red)}
 .role{font-size:12.5px;border:1px solid var(--ink);border-radius:100px;padding:3px 11px;font-weight:600}
 .city-pick{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
 .city-pick select{border:1px solid var(--line);border-radius:var(--r);padding:6px 10px;font-weight:600}
@@ -322,7 +324,7 @@ body.locked{overflow:hidden}
         <label for="city">Территория</label>
         <select id="city"></select>
       </div>
-      <button class="btn" id="logout">Выйти из профиля</button>
+      <button class="btn btn-exit" id="logout">Выйти из профиля</button>
     </div>
   </div>
 </header>
@@ -389,9 +391,27 @@ const word = n => (n % 10 === 1 && n % 100 !== 11) ? 'документ'
 /* ---------- территории ---------- */
 const CITY = {};
 KEYS.forEach((k, i) => CITY[k] = {
-  name: 'Город ' + (i + 1), pass: '1234', landing: '', final: '', budget: '',
+  name: 'Город ' + (i + 1), pass: '1234', landing: '', budget: '',
   votes: 0, target: 0
 });
+
+/* настройки территорий общие для всех страниц сайта */
+const SKEY = 'pbsreda-cities-v1';
+function loadCities(){
+  try {
+    const raw = localStorage.getItem(SKEY);
+    if (!raw) return;
+    const o = JSON.parse(raw);
+    KEYS.forEach(k => { if (o[k]) Object.assign(CITY[k], o[k]); });
+  } catch (e) {}
+}
+function saveCities(){
+  try { localStorage.setItem(SKEY, JSON.stringify(CITY)); return true; } catch (e) { return false; }
+}
+loadCities();
+let DRAFT = JSON.parse(JSON.stringify(CITY));
+const cityDirty = k => JSON.stringify(DRAFT[k]) !== JSON.stringify(CITY[k]);
+const anyDirty = () => KEYS.some(cityDirty);
 
 const STATE = {};
 KEYS.forEach(k => {
@@ -445,20 +465,20 @@ function renderSettings(){
     '<div class="tpl' + (setOpen ? ' open' : '') + '"><button class="tpl-h" id="set-toggle" aria-expanded="' + setOpen + '">' +
     'Территории, доступы и данные проекта<u>настраиваете вы</u></button><div class="tpl-b">' +
     KEYS.map(k => {
-      const c = CITY[k];
+      const c = DRAFT[k];
       return '<div class="cityset"><h4>' + esc(c.name) + ' · pbsreda.ru/' + k + '</h4><div class="g">' +
         fld(k, 'name', 'Название территории', c.name) +
         fld(k, 'pass', 'Пароль для администрации', c.pass) +
         fld(k, 'budget', 'Бюджет проекта', c.budget, 'например 210 млн ₽') +
-        fld(k, 'landing', 'Ссылка на промежуточные результаты', c.landing, 'https://') +
-        fld(k, 'final', 'Ссылка на итоговый вариант', c.final, 'https://') +
+        fld(k, 'landing', 'Ссылка на страницу проекта', c.landing, 'https://') +
         '<div class="f"><label>Голосование: проголосовало / цель</label><div style="display:flex;gap:8px">' +
           '<input data-set="' + k + '|votes" value="' + esc(String(c.votes)) + '" inputmode="numeric">' +
           '<input data-set="' + k + '|target" value="' + esc(String(c.target)) + '" inputmode="numeric"></div></div>' +
         '</div><div class="acts">' +
+        '<button class="btn btn-main" id="save-' + k + '" data-save="' + k + '"' + (cityDirty(k) ? '' : ' disabled') + '>Сохранить</button>' +
         '<button class="btn" data-gen="' + k + '">Случайный пароль</button>' +
         '<button class="btn" data-copy="' + k + '">Скопировать доступ</button>' +
-        '<span class="hint">Название меняется и на странице территории, и в списке при входе</span>' +
+        '<span class="hint">' + (cityDirty(k) ? 'Есть несохранённые изменения' : 'Название и данные меняются на странице территории и в списке при входе') + '</span>' +
         '</div></div>';
     }).join('') +
     '<p class="hint" style="margin:12px 0 0">Пароль кабинетов бюро: куратор, менеджер и специалист входят по своим паролям — их меняем на этапе подключения базы.</p>' +
@@ -475,13 +495,12 @@ function renderInfo(){
   const pct = c.target > 0 ? Math.min(100, Math.round(c.votes / c.target * 100)) : 0;
   el('info').innerHTML =
     '<div class="ir"><b>Бюджет проекта</b><span>' + (c.budget ? esc(c.budget) : 'уточняется') + '</span></div>' +
-    '<div class="ir"><b>Промежуточные результаты</b><span>' +
-      (c.landing ? '<a href="' + esc(c.landing) + '" target="_blank" rel="noopener">открыть страницу проекта</a>' : 'ссылку добавит куратор') +
+    '<div class="ir"><b>Страница проекта</b><span>' +
+      (c.landing ? '<a href="' + esc(c.landing) + '" target="_blank" rel="noopener">открыть</a>' : 'ссылку добавит куратор') +
     '</span></div>' +
     '<div class="vote"><div class="vote-n"><b>' + c.votes.toLocaleString('ru-RU') + '</b>' +
       '<span>проголосовало из ' + (c.target ? c.target.toLocaleString('ru-RU') + ' нужных' : 'цели, которую поставит куратор') + '</span></div>' +
-      '<div class="vbar"><i style="width:' + pct + '%"></i></div></div>' +
-    (c.final ? '<a class="btn btn-main fin" href="' + esc(c.final) + '" target="_blank" rel="noopener">Итоговый вариант заявки</a>' : '');
+      '<div class="vbar"><i style="width:' + pct + '%"></i></div></div>';
 }
 
 /* ---------- фильтры ---------- */
@@ -705,7 +724,18 @@ document.addEventListener('click', e => {
     chips(); render(); reopen(i); toast('Возвращено на доработку'); return;
   }
   if (d.done !== undefined){ const i = +d.done; items[i].done = !items[i].done; chips(); render(); reopen(i); return; }
-  if (d.gen !== undefined){ CITY[d.gen].pass = newPass(); renderSettings(); toast('Новый пароль: ' + CITY[d.gen].pass); return; }
+  if (d.save !== undefined){
+    const k = d.save;
+    CITY[k] = JSON.parse(JSON.stringify(DRAFT[k]));
+    const okSave = saveCities();
+    renderSettings(); applyRole();
+    toast(okSave ? 'Сохранено — изменения видны на странице территории и при входе'
+                 : 'Сохранено в этой вкладке. Постоянное хранение появится вместе с базой');
+    return;
+  }
+  if (d.gen !== undefined){
+    DRAFT[d.gen].pass = newPass(); renderSettings(); toast('Новый пароль: ' + DRAFT[d.gen].pass + ' — нажмите «Сохранить»'); return;
+  }
   if (d.copy !== undefined){
     const k = d.copy, txt = 'Страница: pbsreda.ru/' + k + '  ·  Пароль: ' + CITY[k].pass;
     try { navigator.clipboard.writeText(txt); } catch (err) {}
@@ -722,9 +752,8 @@ document.addEventListener('input', e => {
   else if (d.dl !== undefined) items[+d.dl].deadline = e.target.value;
   else if (d.set !== undefined){
     const [k, key] = d.set.split('|');
-    CITY[k][key] = (key === 'votes' || key === 'target') ? (parseInt(e.target.value.replace(/\D/g,''), 10) || 0) : e.target.value;
-    if (key === 'name'){ fillCities(); if (k === KEY) el('hero-city').textContent = CITY[k].name; }
-    renderInfo();
+    DRAFT[k][key] = (key === 'votes' || key === 'target') ? (parseInt(e.target.value.replace(/\D/g,''), 10) || 0) : e.target.value;
+    const b = el('save-' + k); if (b) b.disabled = false;
   }
   else if (e.target.id === 'q'){ query = e.target.value; render(); }
 });
@@ -765,7 +794,7 @@ function applyRole(){
   el('hero-city').textContent = info().name;
   el('role-tag').textContent = ROLE_NAME[ROLE];
   el('hero-sub').textContent = ROLE === 'adm'
-    ? 'Куратор бюро — Кулиджанова Нана'
+    ? 'Координатор бюро — Кулиджанова Нана'
     : 'Проектное бюро «Среда» · ' + ROLE_NAME[ROLE];
   document.title = info().name + ' — сбор документов заявки';
   filter = 'all'; query = ''; chips(); render();
@@ -780,6 +809,13 @@ if (ROLE !== 'adm'){
   });
 }
 applyRole();
+
+window.addEventListener('storage', e => {
+  if (e.key !== SKEY) return;
+  loadCities();
+  DRAFT = JSON.parse(JSON.stringify(CITY));
+  applyRole();
+});
 
 /* ---------- вход и выход ---------- */
 let TAB = 'adm';
@@ -825,6 +861,10 @@ el('g-go').onclick = enter;
 el('g-pass').onkeydown = e => { if (e.key === 'Enter') enter(); };
 
 el('logout').onclick = () => {
+  const msg = (isCrd() && anyDirty())
+    ? 'Есть несохранённые изменения в настройках территорий. Выйти без сохранения?'
+    : 'Выйти из профиля? Чтобы вернуться, понадобится пароль.';
+  if (!confirm(msg)) return;
   try { location.href = 'index.html'; } catch (err) {}
   setTimeout(showGate, 400);
 };
