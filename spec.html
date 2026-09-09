@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Проектное бюро «Среда» — сбор документов заявки</title>
+<title>Доска заявки — Проектное бюро «Среда»</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -261,6 +261,46 @@ body.locked{overflow:hidden}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+<style>
+.boardwrap{max-width:1560px;margin:0 auto;padding:18px 20px 40px}
+.bhead{display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:16px}
+.bhead h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:0}
+.bhead h1 em{font-style:normal;display:block;font-size:13px;font-weight:400;color:var(--ink-2);margin-top:3px}
+.bstat{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--ink-2)}
+.bstat b{font-size:20px;font-weight:700;color:var(--ink)}
+.bstat .bar{width:200px;height:6px;background:var(--line-2);border-radius:100px;overflow:hidden}
+.bstat .bar i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
+
+.bsec{margin-bottom:14px}
+.bsec-h{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--ink);padding-bottom:5px;margin-bottom:8px}
+.bsec-h h2{font-size:13px;font-weight:700;margin:0}
+.bsec-h span{margin-left:auto;font-size:12px;color:var(--ink-2)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px}
+.tile{position:relative;height:78px;border:1px solid var(--line);border-radius:var(--r);background:#fff;
+  padding:6px 7px;text-align:left;cursor:pointer;overflow:hidden;display:block}
+.tile:hover{border-color:var(--ink-3)}
+.tile .num{font-size:10px;color:var(--ink-3);font-weight:600;position:relative;z-index:2}
+.tile .nm{font-size:10.5px;line-height:1.25;margin-top:2px;position:relative;z-index:2;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.tile .thumb{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
+.tile .thumb::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.72)}
+.tile.done{border-color:var(--green);background:var(--green-pale)}
+.tile.file:not(.done){border-color:var(--green-soft)}
+.tile .mark{position:absolute;right:5px;bottom:4px;z-index:3;font-size:10px;color:var(--green-dark);font-weight:700}
+.tile .clip{position:absolute;right:6px;top:5px;z-index:3;font-size:10px;color:var(--ink-3)}
+
+.modal{position:fixed;inset:0;background:rgba(23,33,27,.35);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal[hidden]{display:none}
+.modal-c{background:#fff;border:1px solid var(--ink);border-radius:var(--r);width:100%;max-width:520px;padding:22px}
+.modal-c h3{margin:0 0 4px;font-size:17px;font-weight:700}
+.modal-c .mnum{font-size:12.5px;color:var(--ink-3);margin-bottom:14px}
+.modal-c .prev{border:1px solid var(--line);border-radius:var(--r);padding:10px;margin-bottom:14px;font-size:13px;color:var(--ink-2)}
+.modal-c .prev img{display:block;max-width:100%;max-height:260px;margin:0 auto;border-radius:2px}
+.modal-c .acts{margin-top:0}
+.modal-c .close{margin-left:auto}
+@media (max-width:900px){.tiles{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}.bstat{margin-left:0}}
+</style>
+
 </head>
 <body>
 
@@ -328,497 +368,192 @@ body.locked{overflow:hidden}
     </div>
   </div>
 </header>
-
-<section class="hero">
-  <div class="hero-in">
-    <div class="hero-head">
-      <div class="hero-city"><span id="hero-city">Город</span>
-        <em id="hero-sub"></em>
-      </div>
-      <div class="info" id="info"></div>
-    </div>
-    <div class="tally" id="tally" aria-label="Опись запросов"></div>
-    <div class="tally-legend">
-      <span><i class="dot"></i>не загружено</span>
-      <span><i class="dot sent"></i>на проверке</span>
-      <span><i class="dot ok"></i>принято</span>
-      <span style="margin-left:auto">Одно деление — один запрос</span>
+<div class="boardwrap">
+  <div class="bhead">
+    <h1><span id="hero-city">Город</span>
+      <em id="hero-sub"></em>
+    </h1>
+    <div class="bstat">
+      <span><b id="b-done">0</b> из <span id="b-all">0</span> листов готово</span>
+      <div class="bar"><i id="b-bar"></i></div>
+      <span id="b-files">0 с файлами</span>
     </div>
   </div>
-</section>
-
-<div class="wrap">
-  <nav class="rail">
-    <h3>Блоки документов</h3>
-    <div id="rail-links"></div>
-    <div class="rail-note" id="rail-note"></div>
-  </nav>
-  <main class="main">
-    <div id="set-box"></div>
-    <div id="tpl-box"></div>
-    <div class="bar" id="chips"></div>
-    <div id="list"></div>
-    <p class="empty" id="empty" hidden>По этому фильтру запросов нет.</p>
-    <p class="page-foot">© 2026 Проектное бюро «Среда». Все права защищены.</p>
-  </main>
+  <div id="board"></div>
+  <p class="page-foot">© 2026 Проектное бюро «Среда». Все права защищены.</p>
 </div>
 
-<div class="foot">
-  <div class="foot-in">
-    <b id="f-count"></b>
-    <div class="foot-bar"><i id="f-bar"></i></div>
-    <span id="f-hint"></span>
-    <button class="btn" id="f-report">Выгрузить опись</button>
+<div class="modal" id="modal" hidden>
+  <div class="modal-c">
+    <h3 id="m-name">—</h3>
+    <p class="mnum" id="m-num"></p>
+    <div class="prev" id="m-prev">Файл ещё не загружен</div>
+    <div class="acts" id="m-acts"></div>
   </div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-const DATA = [{"title":"Сопроводительные документы — строго по перечню заявки","items":[{"code":"ПРОТОКОЛ1","t":"Протокол № 1 общественной комиссии о выборе территории","need":"Скан с подписями и приложениями, PDF","nm":"Решение о выборе территории","n":"1.3","forr":""},{"code":"ПРОТОКОЛ2","t":"Протокол № 2 подведения итогов приёма предложений по мероприятиям","need":"Скан с подписями, PDF","nm":"Решение о перечне мероприятий","n":"1.4","forr":""},{"code":"ГЕНПЛАН","t":"Генеральный план муниципального образования, актуальная редакция","need":"DWG + PDF","nm":"Схема в контексте города","n":"1.5.1","forr":"4.3"},{"code":"РАЗВИТИЕ","t":"Мероприятия по развитию за 2022–2028: дороги, фасады, реконструкция, новое строительство","need":"Текст с адресами, стоимостью и годом реализации","nm":"Программы и инвестпроекты","n":"1.5.4","forr":"3.3"},{"code":"НАСЕЛЕНИЕ","t":"Справка о численности населения на отчётную дату","need":"Справка на бланке, скан","nm":"Численность населения","n":"1.9","forr":"5.7"},{"code":"ЕГРН","t":"Выписки ЕГРН, схема границ, сведения о правообладателях","need":"PDF","nm":"Отсутствие претензий на участок","n":"1.10","forr":""},{"code":"ОХРАНЗОНЫ","t":"Границы зон охраны объектов культурного наследия и исторического поселения","need":"Карта с нанесением зон и пояснением","nm":"Справка по культурному наследию","n":"1.11","forr":"4.3"},{"code":"ТОПО","t":"Топографическая съёмка территории, не старше 3 лет","need":"DWG (М 1:500) + PDF","nm":"Актуальная топосъёмка","n":"1.13","forr":"4.4"}]},{"title":"Территория, границы и градостроительные документы","items":[{"code":"ПЗЗ","t":"Правила землепользования и застройки","need":"PDF + карта градостроительного зонирования","nm":"Существующее положение","n":"1","forr":"4.3, 4.4"},{"code":"ООПТ","t":"Охраняемые природные зоны в 10 минутах пешком, с указанием проблем","need":"Карта с нанесением зон и пояснением","nm":"Существующее положение","n":"2","forr":"4.3"},{"code":"ЗАСТРОЙКА","t":"Многоэтажная застройка: жилые и общественные объекты выше 2 этажей","need":"Карта с адресами и числом квартир","nm":"Существующее положение","n":"3","forr":"4.3, 5.3"},{"code":"ПРОСТРАНСТВА","t":"Общественные пространства: парки, скверы, площади, зелёные зоны, аллеи, подходы к воде","need":"Объекты, нанесённые на Яндекс-карту","nm":"Обоснование выбора места","n":"4","forr":"3.1, 4.2"},{"code":"КУЛЬТОБЪЕКТЫ","t":"Объекты культурного значения: храмы, памятники, воинские захоронения, знаковые и событийные места","need":"Текст с фото, наименованиями и адресами","nm":"Обоснование выбора места","n":"5","forr":"1.11, 4.2"},{"code":"МАСТЕРПЛАН","t":"Мастер-план территории (при наличии)","need":"PDF","nm":"Задачи развития муниципального образования","n":"6","forr":"3.1"},{"code":"ИСТОРИЯ","t":"Историческая справка по основным вехам развития, в том числе об утраченных объектах","need":"Текст с фотографиями, контакты музеев и архивов","nm":"Обоснование выбора места","n":"7","forr":"1.6, 4.2"}]},{"title":"Инженерная и транспортная инфраструктура","items":[{"code":"ВОДА","t":"Схема водоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"1","forr":"1.5.5, 4.3"},{"code":"ГАЗ","t":"Схема газоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"2","forr":"1.5.5, 4.3"},{"code":"КАНАЛИЗАЦИЯ","t":"Схема канализации и водоотведения","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"3","forr":"1.5.5, 4.3"},{"code":"ТЕПЛО","t":"Схема теплоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"4","forr":"1.5.5, 4.3"},{"code":"ЭЛЕКТРО","t":"Схема электроснабжения и наружного освещения","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"5","forr":"1.5.5, 4.3"},{"code":"СВЯЗЬ","t":"Схема сетей связи","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"6","forr":"1.5.5, 4.3"},{"code":"ТРАНСПОРТ","t":"Транспортная инфраструктура: маршруты, остановки, вело- и турмаршруты, парковки","need":"Яндекс-карта с маршрутами и номерами","nm":"Существующее положение","n":"7","forr":"4.3, 4.4"}]},{"title":"Население и социальная сфера","items":[{"code":"ДЕМОГРАФИЯ","t":"Демографические показатели: отчёты территориального органа статистики","need":"PDF / XLSX","nm":"Демографические характеристики","n":"1","forr":"5.7"},{"code":"СТАТСБОРНИК","t":"Статистические сборники и доклады с обобщёнными данными за год","need":"PDF","nm":"Демографические характеристики","n":"2","forr":"5.7"},{"code":"СОЦСФЕРА","t":"Объекты социальной сферы: ДК, ЗАГС, МФЦ, почта, школы, детсады, медицина, полиция","need":"Текст с наименованиями и адресами","nm":"Обоснование выбора места","n":"3","forr":"3.2, 4.2"},{"code":"ДК-ПОЛЬЗОВАТЕЛИ","t":"Кто сейчас активно пользуется ДК у территории: кружки, секции, праздники","need":"Перечень с численностью и расписанием","nm":"Социокультурное исследование","n":"4","forr":"2.1, 2.3"}]},{"title":"Экономика, имущество и расходы","items":[{"code":"БИЗНЕС","t":"Малый и средний бизнес в 10 минутах пешком (~500 м): магазины, рынки, кафе, услуги","need":"Текст с наименованиями и адресами","nm":"Обоснование выбора места","n":"1","forr":"4.2, 5.4, 5.6"},{"code":"АРЕНДА","t":"Стоимость кв. м при сдаче в аренду коммерческой и государственной недвижимости","need":"Цифра + источник данных","nm":"Прогноз роста капитализации","n":"2","forr":"5.3, 5.5"},{"code":"ДЕЙСТВ-ГОС","t":"Действующие объекты государственной собственности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации","n":"3","forr":"5.3, 5.5"},{"code":"ЗАБРОШ-БИЗНЕС","t":"Заброшенные объекты предпринимательской деятельности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации","n":"4","forr":"5.3, 5.4"},{"code":"ЗАБРОШ-ГОС","t":"Заброшенные объекты государственной собственности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации","n":"5","forr":"5.3"},{"code":"ИНВЕСТСТРАТЕГИЯ","t":"Инвестиционная стратегия муниципального образования","need":"PDF","nm":"Потенциал развития предприятий","n":"6","forr":"3.1, 5.6"},{"code":"ПРОГНОЗ","t":"Прогноз социально-экономического развития муниципального образования","need":"PDF","nm":"Иные экономические и социальные эффекты","n":"7","forr":"3.1, 5.8"},{"code":"АНАЛОГ","t":"Объект-аналог: штатная численность, площадь территории, фактические расходы за год","need":"Заполненный шаблон XLSX","nm":"Эксплуатационные расходы","n":"8","forr":"5.2, 5.9"},{"code":"РАСХОДЫ","t":"Укрупнённый расчёт ежегодных эксплуатационных расходов по форме 5.2","need":"Заполненный шаблон XLSX","nm":"Эксплуатационные расходы","n":"9","forr":"5.2, 5.9"}]},{"title":"Программы, стратегии и решения администрации","items":[{"code":"СТРАТЕГИЯ","t":"Стратегия социально-экономического развития муниципального образования","need":"PDF, с датой утверждения","nm":"Задачи развития муниципального образования","n":"1","forr":"3.1"},{"code":"ОТЧЁТЫ","t":"Отчёты о реализации муниципальных программ за 3 года","need":"PDF","nm":"Задачи развития муниципального образования","n":"2","forr":"3.1"},{"code":"ПОСТАНОВЛЕНИЯ","t":"Постановления и решения администрации и Собрания депутатов за 3 года по развитию территории","need":"PDF","nm":"Задачи развития муниципального образования","n":"3","forr":"3.1"},{"code":"МУНПРОГРАММЫ","t":"Действующие муниципальные программы с целями, задачами и этапами","need":"PDF","nm":"Механизмы синхронизации","n":"4","forr":"1.5.4, 3.3"},{"code":"ПСД","t":"Проектно-сметная документация и планы по инфраструктурным проектам (при наличии)","need":"PDF","nm":"Механизмы синхронизации","n":"5","forr":"1.5.4, 3.3"}]},{"title":"Общественное участие и медиа","items":[{"code":"ОПРОС","t":"Распространение ссылки на онлайн-опрос по чатам, группам, коллективам","need":"Скрины рассылки, перечень чатов","nm":"Социокультурное исследование","n":"1","forr":"2.1, 2.2"},{"code":"ФОКУСГРУППА","t":"Список участников фокус-группы с должностями и контактами","need":"Таблица ФИО, должность, телефон","nm":"Социокультурное исследование","n":"2","forr":"2.1, 2.2"},{"code":"КОМАНДА","t":"Состав «команды перемен»: директора школ, ДК, предприниматели, активисты","need":"Список ФИО, должность, телефон, XLSX","nm":"Соучаствующее проектирование","n":"3","forr":"2.2"},{"code":"КОНКУРСЫ","t":"Тематика и сроки конкурса творческих работ (лого, детская площадка, входная группа, сочинение)","need":"Согласованный перечень номинаций и сроков","nm":"Соучаствующее проектирование","n":"4","forr":"2.2, 2.4"},{"code":"СЕМИНАР-ПЛОЩАДКА","t":"Помещение и оборудование для проектного семинара на ~40 человек (не в администрации)","need":"Адрес, фото зала, подтверждение брони","nm":"Соучаствующее проектирование","n":"5","forr":"2.2"},{"code":"СМИ","t":"Публикация протоколов в СМИ и на сайте администрации","need":"Ссылки + скриншоты с видимой датой","nm":"Соучаствующее проектирование","n":"6","forr":"2.2, 2.4"},{"code":"ФОРМЫ-СКРИНЫ","t":"Скрины (фото) всех форм сбора предложений в электронном виде","need":"Папка со скринами","nm":"Соучаствующее проектирование","n":"7","forr":"2.2, 2.4"},{"code":"СУББОТНИК","t":"Субботник / день древонасаждения на территории","need":"Дата проведения, фотоотчёт, список участников","nm":"Программа развития территории","n":"8","forr":"2.3, 2.4"}]}];
-const PAGE = {role:'spec', key:'city1'};
+const BOARD = [{"title":"1. Сопроводительные документы","tiles":[{"id":"s0_0","n":"1.1","t":"Письмо главы субъекта"},{"id":"s0_1","n":"1.2","t":"Протокол МВК"},{"id":"s0_2","n":"1.3","t":"Протокол ОК: выбор территории"},{"id":"s0_3","n":"1.4","t":"Протокол ОК: мероприятия"},{"id":"s0_4","n":"1.5","t":"Письмо главы МО с приложениями"},{"id":"s0_5","n":"1.5.1","t":"Схема границ проектирования"},{"id":"s0_6","n":"1.6","t":"Описание проекта и команда"},{"id":"s0_7","n":"1.9","t":"Письмо Росстата о населении"},{"id":"s0_8","n":"1.10","t":"Отсутствие претензий на участок"},{"id":"s0_9","n":"1.13","t":"Актуальная топосъёмка"}]},{"title":"2. Общественное обсуждение и соучаствующее проектирование","tiles":[{"id":"s1_0","n":"2.1","t":"Ситуационный план, город"},{"id":"s1_1","n":"2.1.1","t":"Методы анализа"},{"id":"s1_2","n":"2.1.2","t":"Бенефициары территории"},{"id":"s1_3","n":"2.1.3","t":"Существующие функции"},{"id":"s1_4","n":"2.1.3","t":"Утраченные функции"},{"id":"s1_5","n":"2.1.3","t":"Ценности территории"},{"id":"s1_6","n":"2.1.4","t":"Актуальная роль территории"},{"id":"s1_7","n":"2.2.1","t":"Стратегия вовлечения"},{"id":"s1_8","n":"2.2.2","t":"Информационная кампания"},{"id":"s1_9","n":"2.2.2","t":"Проектный семинар"},{"id":"s1_10","n":"2.2.5","t":"Выводы обсуждений"},{"id":"s1_11","n":"2.3.1","t":"Событийный календарь"}]},{"title":"3. Обоснованность выбора места и востребованность","tiles":[{"id":"s2_0","n":"3.1","t":"Ситуационный план города"},{"id":"s2_1","n":"3.1","t":"Историческая справка"},{"id":"s2_2","n":"3.1","t":"Задачи развития территории"},{"id":"s2_3","n":"3.1","t":"Демографические показатели"},{"id":"s2_4","n":"3.1","t":"Социально-демографическая ситуация"},{"id":"s2_5","n":"3.1","t":"Объекты социнфраструктуры"},{"id":"s2_6","n":"3.1","t":"Идентичность"},{"id":"s2_7","n":"3.1","t":"Проблемы городского развития"},{"id":"s2_8","n":"3.2","t":"Функциональное зонирование"},{"id":"s2_9","n":"3.2","t":"Численность населения"},{"id":"s2_10","n":"3.2","t":"Востребованность по опросу"},{"id":"s2_11","n":"3.3","t":"Программы и инвестпроекты"}]},{"title":"4. Альбом со схемами и графическими материалами","tiles":[{"id":"s3_0","n":"4.2.1","t":"Ситуационный план, город"},{"id":"s3_1","n":"4.2.2","t":"Территория в системе пространств"},{"id":"s3_2","n":"4.2.4","t":"Проблемы территории"},{"id":"s3_3","n":"4.2.5","t":"Историческая справка"},{"id":"s3_4","n":"4.2.6","t":"Объекты культурного значения"},{"id":"s3_5","n":"4.2.7","t":"Объекты социнфраструктуры"},{"id":"s3_6","n":"4.2.7","t":"Малый и средний бизнес"},{"id":"s3_7","n":"4.2.8","t":"Зоны активности сообществ"},{"id":"s3_8","n":"4.3.1","t":"Существующее зонирование"},{"id":"s3_9","n":"4.3.2","t":"Ландшафтно-визуальный анализ"},{"id":"s3_10","n":"4.3.3","t":"Транспорт и парковки"},{"id":"s3_11","n":"4.3.4","t":"Инженерная инфраструктура"},{"id":"s3_12","n":"4.3.5","t":"Существующее озеленение"},{"id":"s3_13","n":"4.3.7","t":"Границы зон охраны"},{"id":"s3_14","n":"4.3.8","t":"Численность населения"},{"id":"s3_15","n":"4.3.9","t":"Фотофиксация участка"},{"id":"s3_16","n":"4.4.2","t":"Схема генерального плана"},{"id":"s3_17","n":"4.4.3","t":"Проектное зонирование"},{"id":"s3_18","n":"4.4.4","t":"Малые архитектурные формы"},{"id":"s3_19","n":"4.4.5","t":"Схема покрытий"},{"id":"s3_20","n":"4.4.6","t":"Схема озеленения"},{"id":"s3_21","n":"4.4.7","t":"Схема освещения"},{"id":"s3_22","n":"4.4.8","t":"Транспортно-пешеходный каркас"},{"id":"s3_23","n":"4.4.13","t":"Визуализации решений"},{"id":"s3_24","n":"4.5","t":"Пояснительная записка"},{"id":"s3_25","n":"4.6","t":"Планшет"}]},{"title":"5. Технико-экономическое и финансовое обоснование","tiles":[{"id":"s4_0","n":"5.1","t":"Расчёт стоимости реализации"},{"id":"s4_1","n":"5.1","t":"Методика расчёта затрат"},{"id":"s4_2","n":"5.2","t":"Эксплуатационные расходы"},{"id":"s4_3","n":"5.3","t":"Текущие ставки аренды"},{"id":"s4_4","n":"5.3","t":"Кадастровая стоимость"},{"id":"s4_5","n":"5.4","t":"Новые объекты бизнеса"},{"id":"s4_6","n":"5.5","t":"Налоговые и неналоговые эффекты"},{"id":"s4_7","n":"5.6","t":"Развитие сферы услуг"},{"id":"s4_8","n":"5.7","t":"Демографические показатели"},{"id":"s4_9","n":"5.8","t":"Схема синхронизации проектов"},{"id":"s4_10","n":"5.8","t":"Прогноз пешеходных потоков"},{"id":"s4_11","n":"5.9","t":"Основные показатели проекта"}]}];
+const PAGE = {role:'spec'};
 const KEYS = ['city1','city2','city3','city4','city5','city6','city7','city8','city9','city10'];
-const ROOT = 'Общий диск «Среда» / Конкурс 2027 / ';
 const PASS = {crd:'1234', mgr:'1234', spec:'1234'};
-
-const ST = {none:'Не загружено', sent:'На проверке', ok:'Принято'};
+const ROLE_NAME = {adm:'Администрация', crd:'Куратор бюро', mgr:'Менеджер бюро', spec:'Специалист бюро'};
 const el = id => document.getElementById(id);
 const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const kb = n => n < 1048576 ? Math.max(1, Math.round(n/1024)) + ' КБ' : (n/1048576).toFixed(1) + ' МБ';
-const word = n => (n % 10 === 1 && n % 100 !== 11) ? 'документ'
-  : ((n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'документа' : 'документов');
 
-/* ---------- территории ---------- */
+/* настройки территорий — общие с остальными страницами сайта */
 const CITY = {};
-KEYS.forEach((k, i) => CITY[k] = {
-  name: 'Город ' + (i + 1), pass: '1234', landing: '', budget: '',
-  votes: 0, target: 0
-});
+KEYS.forEach((k, i) => CITY[k] = {name:'Город ' + (i + 1), pass:'1234'});
+try {
+  const raw = localStorage.getItem('pbsreda-cities-v1');
+  if (raw){ const o = JSON.parse(raw); KEYS.forEach(k => { if (o[k]) Object.assign(CITY[k], o[k]); }); }
+} catch (e) {}
 
-/* настройки территорий общие для всех страниц сайта */
-const SKEY = 'pbsreda-cities-v1';
-function loadCities(){
-  try {
-    const raw = localStorage.getItem(SKEY);
-    if (!raw) return;
-    const o = JSON.parse(raw);
-    KEYS.forEach(k => { if (o[k]) Object.assign(CITY[k], o[k]); });
-  } catch (e) {}
+/* состояние доски: готовность и файлы по каждому листу */
+const BKEY = 'pbsreda-board-v1';
+let WORK = {};
+function loadBoard(){ try { WORK = JSON.parse(localStorage.getItem(BKEY) || '{}'); } catch (e) { WORK = {}; } }
+function saveBoard(){
+  try { localStorage.setItem(BKEY, JSON.stringify(WORK)); }
+  catch (e) {                       // не поместилось — храним без картинок
+    const light = {};
+    for (const c in WORK){ light[c] = {}; for (const t in WORK[c]) light[c][t] = {done:WORK[c][t].done, file:WORK[c][t].file}; }
+    try { localStorage.setItem(BKEY, JSON.stringify(light)); } catch (e2) {}
+  }
 }
-function saveCities(){
-  try { localStorage.setItem(SKEY, JSON.stringify(CITY)); return true; } catch (e) { return false; }
-}
-loadCities();
-let DRAFT = JSON.parse(JSON.stringify(CITY));
-const cityDirty = k => JSON.stringify(DRAFT[k]) !== JSON.stringify(CITY[k]);
-const anyDirty = () => KEYS.some(cityDirty);
+loadBoard();
 
-const STATE = {};
-KEYS.forEach(k => {
-  STATE[k] = [];
-  DATA.forEach((s, si) => s.items.forEach(it => STATE[k].push(Object.assign({}, it, {
-    sec: si, secTitle: s.title, status: 'none', files: [], fio: '', contact: '',
-    note: '', deadline: '', back: '', done: false
-  }))));
-});
+let ROLE = PAGE.role, KEY = KEYS[0], OPEN = null;
+const cell = id => { WORK[KEY] = WORK[KEY] || {}; return WORK[KEY][id] = WORK[KEY][id] || {done:false, file:'', img:''}; };
+const cellOf = id => (WORK[KEY] && WORK[KEY][id]) || {done:false, file:'', img:''};
+const canEdit = () => ROLE === 'spec';
 
-let KEY = PAGE.key, ROLE = PAGE.role, items = STATE[KEY], filter = 'all', query = '';
-const info = () => CITY[KEY];
-const isCrd = () => ROLE === 'crd';
-const path = it => ROOT + info().name + ' / ' + it.secTitle + ' / ' + (it.n ? it.n + ' ' : '') + it.code;
-
-const ICON_FOLDER = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M1.5 3.5h4l1.2 1.6h7.8v7.4a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V3.5Z" stroke="#8A948C" stroke-width="1.2" stroke-linejoin="round"/></svg>';
-const ICON_FILE = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 1.5h5l3.2 3.2v9.8H4V1.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5v3.4h3.2" stroke="currentColor" stroke-width="1.2"/></svg>';
-
-/* ---------- шаблоны ---------- */
-const TPL = [
-  {n:'Шаблон конкурсной заявки', d:'Структура разделов, как её принимает Минстрой', f:null},
-  {n:'Пример заполненной заявки', d:'Заявка города-победителя целиком, для ориентира', f:null},
-  {n:'Форма 5.2 «Эксплуатационные расходы»', d:'XLSX, заполняется администрацией', f:null, code:'РАСХОДЫ'},
-  {n:'Форма по объекту-аналогу', d:'XLSX, штатная численность, площадь, расходы за год', f:null, code:'АНАЛОГ'},
-  {n:'Форма списка «команды перемен»', d:'XLSX, ФИО, должность, телефон', f:null, code:'КОМАНДА'},
-  {n:'Форма списка фокус-группы', d:'XLSX, участники с контактами', f:null, code:'ФОКУСГРУППА'},
-  {n:'Пример протокола общественной комиссии', d:'Как оформить протоколы № 1 и № 2', f:null, code:'ПРОТОКОЛ1'},
-  {n:'Пример исторической справки', d:'Объём и подача текста', f:null, code:'ИСТОРИЯ'}
-];
-const tplFor = code => TPL.filter(t => t.code === code);
-let tplOpen = false, setOpen = false;
-
-function renderTpl(){
-  const ready = TPL.filter(t => t.f).length;
-  el('tpl-box').innerHTML =
-    '<div class="tpl' + (tplOpen ? ' open' : '') + '"><button class="tpl-h" id="tpl-toggle" aria-expanded="' + tplOpen + '">' +
-      'Шаблоны и примеры<u>' + (ready ? ready + ' из ' + TPL.length + ' готовы' : 'файлы добавит бюро') + '</u></button>' +
-    '<div class="tpl-b"><ul>' + TPL.map((t, k) =>
-      '<li><span class="fi">' + ICON_FILE + '</span><span class="tn">' + esc(t.n) + '<span>' + esc(t.d) + '</span></span>' +
-      '<span class="ta">' + (t.f ? '<a href="#" data-tget="' + k + '">Скачать</a>' : '<span class="soon">появится здесь</span>') +
-        (isCrd() ? '<button class="btn" data-tput="' + k + '">' + (t.f ? 'Заменить' : 'Загрузить') + '</button>' : '') +
-      '</span></li>').join('') + '</ul></div></div>';
-}
-
-/* ---------- настройки территорий (куратор) ---------- */
-const newPass = () => Math.random().toString(36).slice(2, 6) + '-' + Math.random().toString(36).slice(2, 6);
-
-function renderSettings(){
-  if (!isCrd()){ el('set-box').innerHTML = ''; return; }
-  el('set-box').innerHTML =
-    '<div class="tpl' + (setOpen ? ' open' : '') + '"><button class="tpl-h" id="set-toggle" aria-expanded="' + setOpen + '">' +
-    'Территории, доступы и данные проекта<u>настраиваете вы</u></button><div class="tpl-b">' +
-    KEYS.map(k => {
-      const c = DRAFT[k];
-      return '<div class="cityset"><h4>' + esc(c.name) + ' · pbsreda.ru/' + k + '</h4><div class="g">' +
-        fld(k, 'name', 'Название территории', c.name) +
-        fld(k, 'pass', 'Пароль для администрации', c.pass) +
-        fld(k, 'budget', 'Бюджет проекта', c.budget, 'например 210 млн ₽') +
-        fld(k, 'landing', 'Ссылка на страницу проекта', c.landing, 'https://') +
-        '<div class="f"><label>Голосование: проголосовало / цель</label><div style="display:flex;gap:8px">' +
-          '<input data-set="' + k + '|votes" value="' + esc(String(c.votes)) + '" inputmode="numeric">' +
-          '<input data-set="' + k + '|target" value="' + esc(String(c.target)) + '" inputmode="numeric"></div></div>' +
-        '</div><div class="acts">' +
-        '<button class="btn btn-main" id="save-' + k + '" data-save="' + k + '"' + (cityDirty(k) ? '' : ' disabled') + '>Сохранить</button>' +
-        '<button class="btn" data-gen="' + k + '">Случайный пароль</button>' +
-        '<button class="btn" data-copy="' + k + '">Скопировать доступ</button>' +
-        '<span class="hint">' + (cityDirty(k) ? 'Есть несохранённые изменения' : 'Название и данные меняются на странице территории и в списке при входе') + '</span>' +
-        '</div></div>';
-    }).join('') +
-    '<p class="hint" style="margin:12px 0 0">Пароль кабинетов бюро: куратор, менеджер и специалист входят по своим паролям — их меняем на этапе подключения базы.</p>' +
-    '</div></div>';
-}
-function fld(k, key, label, val, ph){
-  return '<div class="f"><label>' + label + '</label><input data-set="' + k + '|' + key + '" value="' + esc(val) +
-    '" placeholder="' + esc(ph || '') + '"></div>';
-}
-
-/* ---------- инфоблок территории ---------- */
-function renderInfo(){
-  const c = info();
-  const pct = c.target > 0 ? Math.min(100, Math.round(c.votes / c.target * 100)) : 0;
-  el('info').innerHTML =
-    '<div class="ir"><b>Бюджет проекта</b><span>' + (c.budget ? esc(c.budget) : 'уточняется') + '</span></div>' +
-    '<div class="ir"><b>Страница проекта</b><span>' +
-      (c.landing ? '<a href="' + esc(c.landing) + '" target="_blank" rel="noopener">открыть</a>' : 'ссылку добавит куратор') +
-    '</span></div>' +
-    '<div class="vote"><div class="vote-n"><b>' + c.votes.toLocaleString('ru-RU') + '</b>' +
-      '<span>проголосовало из ' + (c.target ? c.target.toLocaleString('ru-RU') + ' нужных' : 'цели, которую поставит куратор') + '</span></div>' +
-      '<div class="vbar"><i style="width:' + pct + '%"></i></div></div>';
-}
-
-/* ---------- фильтры ---------- */
-function counts(){
-  const c = {none:0, sent:0, ok:0, done:0};
-  items.forEach(i => { c[i.status]++; if (i.done) c.done++; });
-  return c;
-}
-function chips(){
-  const c = counts();
-  let set;
-  if (ROLE === 'adm') set = [['all','В работе ' + (items.length - c.ok)], ['none','Не загружено ' + c.none],
-                             ['sent','На проверке ' + c.sent], ['ok','Принято ' + c.ok]];
-  else if (ROLE === 'crd') set = [['all','Все ' + items.length], ['sent','На проверке ' + c.sent],
-                                  ['none','Не загружено ' + c.none], ['ok','Принято ' + c.ok]];
-  else if (ROLE === 'spec') set = [['all','Все ' + items.length], ['ok','Документ принят ' + c.ok],
-                                   ['none','Ждём документ ' + c.none], ['done','Выполнено ' + c.done]];
-  else set = [['all','Все ' + items.length], ['ok','Принято ' + c.ok], ['sent','На проверке ' + c.sent],
-              ['none','Не загружено ' + c.none]];
-  el('chips').innerHTML = set.map(([f, t]) =>
-    '<button class="chip" data-f="' + f + '" aria-pressed="' + (filter === f) + '">' + t + '</button>').join('') +
-    '<div class="search"><input id="q" type="search" value="' + esc(query) + '" placeholder="Поиск по запросам" aria-label="Поиск"></div>';
-}
-
-/* ---------- список ---------- */
-function sub(it){
-  const p = [];
-  if (it.nm) p.push(esc(it.nm));
-  if (it.forr) p.push('нужно в разделах заявки ' + esc(it.forr));
-  if (it.deadline) p.push('срок ' + esc(it.deadline.split('-').reverse().join('.')));
-  return p.length ? '<p>' + p.join(' · ') + '</p>' : '';
-}
-
+/* ---------- доска ---------- */
 function render(){
-  const q = query.trim().toLowerCase();
-  let html = '', shown = 0;
-  DATA.forEach((s, si) => {
-    const own = items.filter(i => i.sec === si);
-    let vis = own.filter(i => !q || (i.code + ' ' + i.t + ' ' + i.need + ' ' + (i.nm || '')).toLowerCase().includes(q));
-    if (filter === 'done') vis = vis.filter(i => i.done);
-    else if (filter !== 'all') vis = vis.filter(i => i.status === filter);
-    else if (ROLE === 'adm') vis = vis.filter(i => i.status !== 'ok');
-    const hidden = (ROLE === 'adm' && filter === 'all') ? own.filter(i => i.status === 'ok').length : 0;
-    if (!vis.length && !hidden) return;
-    shown += vis.length;
-    const ok = own.filter(i => i.status === 'ok').length;
-    html += '<section class="sec" id="sec' + si + '"><div class="sec-h"><h2>' + esc(s.title) +
-      '</h2><span>' + ok + ' из ' + own.length + ' принято</span></div>';
-    if (hidden) html += '<p class="sec-done"><b>' + hidden + '</b> ' + word(hidden) +
-      ' принято бюро и убрано из списка — их догружать не нужно</p>';
-    vis.forEach(it => html += row(it));
-    html += '</section>';
+  let all = 0, done = 0, withFile = 0, html = '';
+  BOARD.forEach((s, si) => {
+    let d = 0;
+    const tiles = s.tiles.map(t => {
+      const c = cellOf(t.id);
+      all++; if (c.done){ done++; d++; } if (c.file) withFile++;
+      return '<button class="tile' + (c.done ? ' done' : '') + (c.file ? ' file' : '') + '" data-t="' + t.id + '" title="' +
+        esc(t.n + ' · ' + t.t) + '">' +
+        (c.img ? '<span class="thumb" style="background-image:url(' + c.img + ')"></span>' : '') +
+        '<span class="num">' + esc(t.n) + '</span>' +
+        '<span class="nm">' + esc(t.t) + '</span>' +
+        (c.file && !c.img ? '<span class="clip">файл</span>' : '') +
+        (c.done ? '<span class="mark">✓</span>' : '') +
+        '</button>';
+    }).join('');
+    html += '<section class="bsec"><div class="bsec-h"><h2>' + esc(s.title) + '</h2><span>' +
+      d + ' из ' + s.tiles.length + ' готово</span></div><div class="tiles">' + tiles + '</div></section>';
   });
-  renderTpl(); renderSettings(); renderInfo();
-  el('list').innerHTML = html;
-  el('empty').hidden = shown > 0;
-  stats();
+  el('board').innerHTML = html;
+  el('b-done').textContent = done;
+  el('b-all').textContent = all;
+  el('b-files').textContent = withFile + ' с файлами';
+  el('b-bar').style.width = Math.round(done / all * 100) + '%';
 }
 
-function row(it){
-  const i = items.indexOf(it);
-  const seeFiles = ROLE === 'adm' || isCrd() || it.status === 'ok';
-  const files = seeFiles ? it.files.map((fl, k) =>
-    '<li><span class="fi">' + ICON_FILE + '</span><span class="fn">' + esc(fl.name) + '</span><span class="fs">' + kb(fl.size) + '</span>' +
-    (isCrd() ? '<button data-del="' + i + '_' + k + '" aria-label="Удалить файл">×</button>' : '') + '</li>').join('') : '';
-
-  let acts = '';
-  if (isCrd()){
-    acts = '<div class="acts">' +
-      '<button class="btn btn-main" data-ok="' + i + '"' + (it.status === 'sent' ? '' : ' disabled') + '>Одобрить</button>' +
-      (it.status === 'ok' ? '<button class="btn" data-unok="' + i + '">Отменить приём</button>'
-                          : '<button class="btn" data-back="' + i + '">Вернуть на доработку</button>') +
-      '<span class="hint">Одобренное уходит из списка территории и становится видно бюро</span></div>';
-  } else if (ROLE === 'adm' && it.status !== 'ok'){
-    acts = '<div class="acts"><span class="hint">Файл уходит на проверку сразу после загрузки. ' +
-      'Заменить или удалить его может куратор бюро.</span></div>';
-  } else if (ROLE === 'spec'){
-    acts = '<div class="acts">' +
-      '<button class="btn' + (it.done ? '' : ' btn-main') + '" data-done="' + i + '">' +
-        (it.done ? 'Снять отметку' : 'Отметить выполнение') + '</button>' +
-      '<span class="hint">Отметка видна куратору и менеджерам</span></div>';
-  }
-
-  let fields = '';
-  if (ROLE === 'adm'){
-    fields = '<div class="grid2">' +
-      '<div class="f"><label for="fio' + i + '">Кто отвечает за документ</label>' +
-        '<input id="fio' + i + '" data-fio="' + i + '" value="' + esc(it.fio) + '" placeholder="ФИО и должность"></div>' +
-      '<div class="f"><label for="c' + i + '">Телефон и почта</label>' +
-        '<input id="c' + i + '" data-contact="' + i + '" value="' + esc(it.contact) + '" placeholder="+7 ··· · почта"></div></div>' +
-      '<div class="f" style="margin-top:12px"><label for="nt' + i + '">Комментарий для куратора</label>' +
-        '<textarea id="nt' + i + '" data-note="' + i + '" placeholder="Например: топосъёмка 2019 года, заказали обновление, будет к 20 числу">' + esc(it.note) + '</textarea></div>';
-  } else if (isCrd()){
-    fields = '<div class="grid2"><div class="f"><label for="dl' + i + '">Срок для территории</label>' +
-        '<input id="dl' + i + '" type="date" data-dl="' + i + '" value="' + esc(it.deadline) + '"></div>' +
-      '<div class="f"><label>Ответственный от администрации</label><input value="' + esc(it.fio || '—') + '" readonly></div></div>' +
-      (it.note ? '<div class="msg"><b>Комментарий администрации:</b> ' + esc(it.note) + '</div>' : '') +
-      '<div class="f" style="margin-top:12px"><label for="bk' + i + '">Что не так — увидит администрация</label>' +
-        '<textarea id="bk' + i + '" data-backtext="' + i + '" placeholder="Например: нужна топосъёмка не старше трёх лет">' + esc(it.back) + '</textarea></div>';
-  }
-
-  return '<div class="row s-' + it.status + '" id="i' + i + '" data-i="' + i + '">' +
-    '<button class="row-h" data-open="' + i + '" aria-expanded="false">' +
-      '<span class="rn">' + esc(it.n || '—') + '</span>' +
-      '<span class="rt"><b><i>' + esc(it.code) + '</i> · ' + esc(it.t) + '</b>' + sub(it) + '</span>' +
-      '<span class="st">' + ST[it.status] + (seeFiles && it.files.length ? ' · ' + it.files.length : '') + '</span>' +
-      (it.done ? '<span class="done-tag">выполнено</span>' : '') +
-    '</button>' +
-    '<div class="body">' +
-      '<div class="req"><em>Что должно лечь в папку:</em><span>' + esc(it.need || '—') + '</span></div>' +
-      tplFor(it.code).map(t => '<div class="rowtpl">' + ICON_FILE + '<em>' + esc(t.n) + '</em><span class="ta">' +
-        (t.f ? '<a href="#" data-tget="' + TPL.indexOf(t) + '">Скачать</a>' : '<span class="soon">появится здесь</span>') +
-        '</span></div>').join('') +
-      '<div class="path">' + ICON_FOLDER + '<span>' + esc(ROOT + info().name + ' / ' + it.secTitle + ' / ') +
-        '<b>' + esc((it.n ? it.n + ' ' : '') + it.code) + '</b></span>' +
-        (ROLE === 'adm' ? '' : '<a href="#" data-drive="' + i + '">Открыть папку</a>') + '</div>' +
-      (it.back && ROLE === 'adm' ? '<div class="msg back"><b>Бюро вернуло на доработку:</b> ' + esc(it.back) + '</div>' : '') +
-      (ROLE === 'adm'
-        ? (it.status === 'ok' ? '<div class="msg ok"><b>Документ принят бюро.</b> Ничего делать не нужно.</div>'
-            : '<div class="drop" data-drop="' + i + '" tabindex="0" role="button">' +
-              '<p><b>Выберите файл</b> или перетащите его сюда</p>' +
-              '<small>PDF, DWG, XLSX, JPG. До 200 МБ на файл</small></div>')
-        : (seeFiles ? '' : '<div class="msg"><b>Файлы на проверке у куратора.</b> Они появятся здесь после одобрения.</div>')) +
-      (files ? '<ul class="files">' + files + '</ul>' : '') +
-      fields + acts +
-    '</div></div>';
+function tileById(id){
+  for (const s of BOARD) for (const t of s.tiles) if (t.id === id) return t;
+  return null;
 }
 
-/* ---------- сводка ---------- */
-function stats(){
-  const c = counts();
-  el('f-count').textContent = isCrd()
-    ? 'Принято ' + c.ok + ' из ' + items.length + ' · на проверке ' + c.sent
-    : ROLE === 'spec' ? 'Выполнено ' + c.done + ' из ' + items.length + ' · документов принято ' + c.ok
-    : 'Принято бюро ' + c.ok + ' из ' + items.length;
-  el('f-bar').style.width = Math.round((ROLE === 'spec' ? c.done : c.ok) / items.length * 100) + '%';
-  el('f-hint').textContent = isCrd() ? 'Вы видите все территории — переключайте в шапке'
-    : ROLE === 'adm' ? (c.sent ? 'Куратор проверяет ' + c.sent + ' — статус изменится после одобрения' : 'Загруженное проверит куратор бюро')
-    : 'Видны документы, одобренные куратором';
+/* ---------- карточка листа ---------- */
+function openTile(id){
+  OPEN = id;
+  const t = tileById(id), c = cellOf(id);
+  el('m-name').textContent = t.t;
+  el('m-num').textContent = 'Пункт заявки ' + t.n + ' · ' + (c.done ? 'готово' : 'в работе');
+  el('m-prev').innerHTML = c.img ? '<img src="' + c.img + '" alt="">'
+    : c.file ? 'Загружен файл: <b>' + esc(c.file) + '</b>' : 'Файл ещё не загружен';
+  el('m-acts').innerHTML = canEdit()
+    ? '<button class="btn btn-main" id="m-up">' + (c.file ? 'Заменить файл' : 'Загрузить файл') + '</button>' +
+      '<button class="btn" id="m-done">' + (c.done ? 'Вернуть в работу' : 'Отметить готово') + '</button>' +
+      (c.file ? '<button class="btn" id="m-del">Убрать файл</button>' : '') +
+      '<button class="btn close" id="m-close">Закрыть</button>'
+    : '<span class="hint">Менеджер видит прогресс, файлы загружает специалист</span>' +
+      '<button class="btn close" id="m-close">Закрыть</button>';
+  el('modal').hidden = false;
+}
+function closeTile(){ el('modal').hidden = true; OPEN = null; }
 
-  el('tally').innerHTML = items.map((it, i) =>
-    '<button class="tick ' + (it.status === 'none' ? '' : it.status) + '" data-go="' + i + '" title="' +
-    esc(it.code + ' — ' + ST[it.status]) + '"></button>').join('');
-
-  el('rail-links').innerHTML = DATA.map((s, si) => {
-    const own = items.filter(i => i.sec === si);
-    const d = own.filter(i => i.status === 'ok').length;
-    return '<a href="#" data-sec="' + si + '" class="' + (d === own.length ? 'full' : '') + '"><b>' + (si + 1) + '</b><span>' +
-      esc(s.title) + '</span><u>' + d + '/' + own.length + '</u></a>';
-  }).join('');
-
-  el('rail-note').innerHTML = isCrd()
-    ? '<b>Кабинет куратора</b>Проверьте загруженное и нажмите «Одобрить». До одобрения файлы не видит никто, кроме вас. После — запрос уходит из списка территории.'
-    : ROLE === 'adm' ? '<b>Как это работает</b>Файл сразу попадает в нужную папку общего диска и уходит на проверку. Куратор бюро одобряет приём, после этого запрос уходит из списка.'
-    : ROLE === 'spec' ? '<b>Кабинет специалиста</b>Здесь видно, какие документы уже пришли и к какому сроку, и можно отметить, что ваша часть готова.'
-    : '<b>Кабинет менеджера</b>Полная картина по территориям: что принято, что на проверке, чего ещё ждём.';
+/* картинку уменьшаем, чтобы она поместилась в память браузера */
+function shrink(file, cb){
+  if (!/^image\//.test(file.type)) return cb('');
+  const fr = new FileReader();
+  fr.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, 320 / Math.max(img.width, img.height));
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(img.width * s); cv.height = Math.round(img.height * s);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      cb(cv.toDataURL('image/jpeg', 0.7));
+    };
+    img.onerror = () => cb('');
+    img.src = fr.result;
+  };
+  fr.onerror = () => cb('');
+  fr.readAsDataURL(file);
 }
 
-/* ---------- действия ---------- */
-function toast(t){ const x = el('toast'); x.textContent = t; x.classList.add('on'); clearTimeout(x._t); x._t = setTimeout(() => x.classList.remove('on'), 3000); }
-function reopen(i){ const r = el('i' + i); if (r){ r.classList.add('open'); r.querySelector('.row-h').setAttribute('aria-expanded','true'); } }
-function openRow(i){
-  const r = el('i' + i); if (!r) return;
-  const was = r.classList.contains('open');
-  document.querySelectorAll('.row.open').forEach(x => { x.classList.remove('open'); x.querySelector('.row-h').setAttribute('aria-expanded','false'); });
-  if (!was) reopen(i);
-}
-function addFiles(i, list){
-  [...list].forEach(f => items[i].files.push({name:f.name, size:f.size}));
-  items[i].status = 'sent'; items[i].back = '';
-  chips(); render(); reopen(i);
-  toast('Файл загружен и ушёл на проверку куратору');
-}
+function toast(t){ const x = el('toast'); x.textContent = t; x.classList.add('on'); clearTimeout(x._t); x._t = setTimeout(() => x.classList.remove('on'), 2600); }
 
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-sec],#tpl-toggle,#set-toggle,[data-gen],[data-copy],[data-tget],[data-tput],' +
-    '[data-open],[data-del],[data-go],[data-drive],[data-drop],[data-ok],[data-unok],[data-back],[data-done],[data-save],.chip');
-  if (!t) return;
-  const d = t.dataset;
-
-  if (d.sec !== undefined){ e.preventDefault(); const s = el('sec' + d.sec); if (s) s.scrollIntoView({behavior:'smooth', block:'start'}); return; }
-  if (t.id === 'tpl-toggle'){ tplOpen = !tplOpen; renderTpl(); return; }
-  if (t.id === 'set-toggle'){ setOpen = !setOpen; renderSettings(); return; }
-  if (t.classList.contains('chip')){ filter = d.f; chips(); render(); return; }
-  if (d.open !== undefined) return openRow(+d.open);
-
-  if (d.go !== undefined){
-    const i = +d.go;
-    if (filter !== 'all'){ filter = 'all'; chips(); render(); }
-    setTimeout(() => { const r = el('i' + i);
-      if (!r){ toast(items[i].code + ' — принято бюро, откройте фильтр «Принято»'); return; }
-      r.scrollIntoView({block:'center', behavior:'smooth'}); openRow(i); }, 30);
-    return;
-  }
-  if (d.drive !== undefined){ e.preventDefault(); toast('Папка на диске: ' + path(items[+d.drive])); return; }
-  if (d.tget !== undefined){ e.preventDefault(); toast('Скачивание: ' + TPL[+d.tget].n); return; }
-  if (d.tput !== undefined){
-    const k = +d.tput, inp = document.createElement('input'); inp.type = 'file';
-    inp.onchange = () => { if (!inp.files.length) return; TPL[k].f = inp.files[0].name; renderTpl(); toast('Шаблон загружен — территориям он виден сразу'); };
-    inp.click(); return;
-  }
-  if (d.drop !== undefined){
-    const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true;
-    inp.onchange = () => inp.files.length && addFiles(+d.drop, inp.files); inp.click(); return;
-  }
-  if (d.del !== undefined){
-    const [i, k] = d.del.split('_').map(Number);
-    items[i].files.splice(k, 1);
-    if (!items[i].files.length) items[i].status = 'none';
-    chips(); render(); reopen(i); toast('Файл удалён'); return;
-  }
-  if (d.ok !== undefined){
-    const i = +d.ok; items[i].status = 'ok'; items[i].back = '';
-    chips(); render(); toast('Принято: ' + items[i].code + '. У территории запрос убран из списка'); return;
-  }
-  if (d.unok !== undefined){ const i = +d.unok; items[i].status = 'sent'; chips(); render(); reopen(i); return; }
-  if (d.back !== undefined){
-    const i = +d.back;
-    if (!items[i].back.trim()){ toast('Напишите, что нужно исправить — администрация увидит текст'); el('bk' + i).focus(); return; }
-    items[i].status = 'none'; items[i].files = [];
-    chips(); render(); reopen(i); toast('Возвращено на доработку'); return;
-  }
-  if (d.done !== undefined){ const i = +d.done; items[i].done = !items[i].done; chips(); render(); reopen(i); return; }
-  if (d.save !== undefined){
-    const k = d.save;
-    CITY[k] = JSON.parse(JSON.stringify(DRAFT[k]));
-    const okSave = saveCities();
-    renderSettings(); applyRole();
-    toast(okSave ? 'Сохранено — изменения видны на странице территории и при входе'
-                 : 'Сохранено в этой вкладке. Постоянное хранение появится вместе с базой');
-    return;
-  }
-  if (d.gen !== undefined){
-    DRAFT[d.gen].pass = newPass(); renderSettings(); toast('Новый пароль: ' + DRAFT[d.gen].pass + ' — нажмите «Сохранить»'); return;
-  }
-  if (d.copy !== undefined){
-    const k = d.copy, txt = 'Страница: pbsreda.ru/' + k + '  ·  Пароль: ' + CITY[k].pass;
-    try { navigator.clipboard.writeText(txt); } catch (err) {}
-    toast('Скопировано: ' + txt); return;
+  const tile = e.target.closest('[data-t]');
+  if (tile) return openTile(tile.dataset.t);
+  const b = e.target.closest('#m-up,#m-done,#m-del,#m-close');
+  if (!b) { if (e.target.id === 'modal') closeTile(); return; }
+  if (b.id === 'm-close') return closeTile();
+  const c = cell(OPEN);
+  if (b.id === 'm-done'){ c.done = !c.done; saveBoard(); render(); openTile(OPEN); return; }
+  if (b.id === 'm-del'){ c.file = ''; c.img = ''; saveBoard(); render(); openTile(OPEN); return; }
+  if (b.id === 'm-up'){
+    const inp = document.createElement('input'); inp.type = 'file';
+    inp.onchange = () => {
+      const f = inp.files[0]; if (!f) return;
+      shrink(f, img => {
+        c.file = f.name; c.img = img;
+        saveBoard(); render(); openTile(OPEN);
+        toast(img ? 'Изображение легло на доску' : 'Файл прикреплён');
+      });
+    };
+    inp.click();
   }
 });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !el('modal').hidden) closeTile(); });
 
-document.addEventListener('input', e => {
-  const d = e.target.dataset;
-  if (d.fio !== undefined) items[+d.fio].fio = e.target.value;
-  else if (d.contact !== undefined) items[+d.contact].contact = e.target.value;
-  else if (d.note !== undefined) items[+d.note].note = e.target.value;
-  else if (d.backtext !== undefined) items[+d.backtext].back = e.target.value;
-  else if (d.dl !== undefined) items[+d.dl].deadline = e.target.value;
-  else if (d.set !== undefined){
-    const [k, key] = d.set.split('|');
-    DRAFT[k][key] = (key === 'votes' || key === 'target') ? (parseInt(e.target.value.replace(/\D/g,''), 10) || 0) : e.target.value;
-    const b = el('save-' + k); if (b) b.disabled = false;
-  }
-  else if (e.target.id === 'q'){ query = e.target.value; render(); }
-});
-
-document.addEventListener('dragover', e => { const z = e.target.closest('.drop'); if (!z) return; e.preventDefault(); z.classList.add('over'); });
-document.addEventListener('dragleave', e => { const z = e.target.closest('.drop'); z && z.classList.remove('over'); });
-document.addEventListener('drop', e => {
-  const z = e.target.closest('.drop'); if (!z) return;
-  e.preventDefault(); z.classList.remove('over');
-  if (e.dataTransfer.files.length) addFiles(+z.dataset.drop, e.dataTransfer.files);
-});
-document.addEventListener('keydown', e => {
-  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('drop')){ e.preventDefault(); e.target.click(); }
-});
-
-/* ---------- территории в списках ---------- */
+/* ---------- территория и роль ---------- */
 function fillCities(){
   const opts = KEYS.map(k => '<option value="' + k + '">' + esc(CITY[k].name) + '</option>').join('');
   el('city').innerHTML = opts; el('city').value = KEY;
   el('g-city').innerHTML = opts; el('g-city').value = KEY;
 }
-el('city').onchange = () => {
-  if (ROLE === 'adm'){ el('city').value = KEY; toast('Администрация видит только свою территорию'); return; }
-  KEY = el('city').value; items = STATE[KEY];
-  location.hash = KEY;
-  applyRole();
-};
-
-el('f-report').onclick = () => toast('Опись выгрузится в XLSX — тот же файл, что ведёт куратор');
-
-/* ---------- роль ---------- */
-const ROLE_NAME = {adm:'Администрация', crd:'Куратор бюро', mgr:'Менеджер бюро', spec:'Специалист бюро'};
 function applyRole(){
-  items = STATE[KEY];
-  document.body.classList.toggle('crd', isCrd());
-  el('city-pick').hidden = ROLE === 'adm';
   fillCities();
-  el('hero-city').textContent = info().name;
+  el('hero-city').textContent = CITY[KEY].name;
   el('role-tag').textContent = ROLE_NAME[ROLE];
-  el('hero-sub').textContent = ROLE === 'adm'
-    ? 'Координатор бюро — Кулиджанова Нана'
-    : 'Проектное бюро «Среда» · ' + ROLE_NAME[ROLE];
-  document.title = info().name + ' — сбор документов заявки';
-  filter = 'all'; query = ''; chips(); render();
+  el('hero-sub').textContent = ROLE === 'spec'
+    ? 'Доска листов заявки: загрузите материал и отметьте готовность'
+    : 'Доска листов заявки: прогресс по всем разделам';
+  document.title = CITY[KEY].name + ' — доска заявки';
+  render();
 }
-
-if (ROLE !== 'adm'){
-  const hs = decodeURIComponent(location.hash.slice(1));
-  if (KEYS.includes(hs)) KEY = hs;
-  window.addEventListener('hashchange', () => {
-    const k = decodeURIComponent(location.hash.slice(1));
-    if (KEYS.includes(k) && k !== KEY && el('gate').hidden){ KEY = k; applyRole(); }
-  });
-}
+el('city').onchange = () => { KEY = el('city').value; location.hash = KEY; applyRole(); };
+window.addEventListener('hashchange', () => {
+  const k = decodeURIComponent(location.hash.slice(1));
+  if (KEYS.includes(k) && k !== KEY && el('gate').hidden){ KEY = k; applyRole(); }
+});
+const hs = decodeURIComponent(location.hash.slice(1));
+if (KEYS.includes(hs)) KEY = hs;
 applyRole();
 
-window.addEventListener('storage', e => {
-  if (e.key !== SKEY) return;
-  loadCities();
-  DRAFT = JSON.parse(JSON.stringify(CITY));
-  applyRole();
-});
-
 /* ---------- вход и выход ---------- */
-let TAB = 'adm';
+let TAB = 'bur';
 function setTab(r){
   TAB = r;
   el('tab-adm').setAttribute('aria-selected', r === 'adm');
@@ -826,13 +561,12 @@ function setTab(r){
   el('g-city-f').hidden = r !== 'adm';
   el('b-role-f').hidden = r !== 'bur';
   el('g-sub').textContent = r === 'bur'
-    ? 'Кабинеты бюро: куратор принимает документы, менеджер видит картину целиком, специалист — сроки по своим материалам.'
+    ? 'Кабинеты бюро: куратор принимает документы, менеджер видит картину целиком, специалист — свои листы.'
     : 'Раздел для администраций городов, с которыми бюро готовит заявку.';
   el('g-err').textContent = '';
 }
 el('tab-adm').onclick = () => setTab('adm');
 el('tab-bur').onclick = () => setTab('bur');
-
 function go(page){
   try { location.href = page + '.html'; } catch (err) {}
   setTimeout(() => { el('g-err').textContent = 'Страница /' + page + ' не открылась — откройте файл вручную'; }, 1200);
@@ -843,49 +577,32 @@ function enter(){
   if (TAB === 'adm'){
     const k = el('g-city').value;
     if (p !== CITY[k].pass){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
-    if (k === KEY && ROLE === 'adm'){ hideGate(); return; }
     go(k); return;
   }
   const r = el('b-role').value;
   if (p !== PASS[r]){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
-  if (r === ROLE){ hideGate(); return; }
+  if (r === ROLE){ el('gate').hidden = true; document.body.classList.remove('locked'); window.scrollTo(0, 0); applyRole(); return; }
   go(r === 'crd' ? 'cur' : r === 'mgr' ? 'man' : 'spec');
-}
-function hideGate(){
-  el('gate').hidden = true;
-  document.body.classList.remove('locked');
-  window.scrollTo(0, 0);
-  applyRole();
 }
 el('g-go').onclick = enter;
 el('g-pass').onkeydown = e => { if (e.key === 'Enter') enter(); };
-
 el('logout').onclick = () => {
-  const msg = (isCrd() && anyDirty())
-    ? 'Есть несохранённые изменения в настройках территорий. Выйти без сохранения?'
-    : ROLE === 'adm'
-      ? 'Вы уверены, что хотите выйти? Загруженные файлы уже у бюро, ничего не потеряется.'
-      : 'Вы уверены, что хотите выйти?';
-  if (!confirm(msg)) return;
+  if (!confirm('Вы уверены, что хотите выйти?')) return;
   try { location.href = 'index.html'; } catch (err) {}
   setTimeout(showGate, 400);
 };
 function showGate(){
   el('g-pass').value = ''; el('g-err').textContent = '';
-  fillCities();
-  el('b-role').value = ROLE === 'adm' ? 'crd' : ROLE;
-  setTab(ROLE === 'adm' ? 'adm' : 'bur');
-  el('g-sub').textContent = ROLE === 'adm'
-    ? 'Страница территории «' + info().name + '». Введите пароль, который выдал куратор бюро.'
-    : 'Кабинет: ' + ROLE_NAME[ROLE] + '. Введите пароль.';
-  document.body.classList.remove('crd');
+  fillCities(); el('b-role').value = ROLE;
+  setTab('bur');
+  el('g-sub').textContent = 'Кабинет: ' + ROLE_NAME[ROLE] + '. Введите пароль.';
   el('gate').hidden = false;
   document.body.classList.add('locked');
-  el('gate').scrollTop = 0;
   window.scrollTo(0, 0);
   el('g-pass').focus();
 }
 showGate();
 </script>
+
 </body>
 </html>
