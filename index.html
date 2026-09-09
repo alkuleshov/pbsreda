@@ -343,7 +343,7 @@ body.locked{overflow:hidden}
 const el = id => document.getElementById(id);
 const KEYS = ['city1','city2','city3','city4','city5','city6','city7','city8','city9','city10'];
 const CITY = {};
-KEYS.forEach((k, i) => CITY[k] = {name:'Город ' + (i + 1), pass:'1234'});
+KEYS.forEach((k, i) => CITY[k] = {name:'Город ' + (i + 1), pass:'1234', active: i < 4});
 try {
   const raw = localStorage.getItem('pbsreda-cities-v1');
   if (raw){ const o = JSON.parse(raw); KEYS.forEach(k => { if (o[k]) Object.assign(CITY[k], o[k]); }); }
@@ -352,7 +352,7 @@ try {
 const PASS_BUR = {crd:'1234', mgr:'1234', spec:'1234'};
 let TAB = 'adm';
 
-el('g-city').innerHTML = KEYS.map(k =>
+el('g-city').innerHTML = KEYS.filter(k => CITY[k].active).map(k =>
   '<option value="' + k + '">' + CITY[k].name.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) + '</option>').join('');
 
 function setTab(r){

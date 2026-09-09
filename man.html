@@ -424,7 +424,7 @@ const esc = s => (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&
 
 /* настройки территорий — общие с остальными страницами сайта */
 const CITY = {};
-KEYS.forEach((k, i) => CITY[k] = {name:'Город ' + (i + 1), pass:'1234'});
+KEYS.forEach((k, i) => CITY[k] = {name:'Город ' + (i + 1), pass:'1234', active: i < 4});
 try {
   const raw = localStorage.getItem('pbsreda-cities-v1');
   if (raw){ const o = JSON.parse(raw); KEYS.forEach(k => { if (o[k]) Object.assign(CITY[k], o[k]); }); }
@@ -586,7 +586,7 @@ document.addEventListener('keydown', e => {
 
 /* ---------- территория и роль ---------- */
 function fillCities(){
-  const opts = KEYS.map(k => '<option value="' + k + '">' + esc(CITY[k].name) + '</option>').join('');
+  const opts = KEYS.filter(k => CITY[k].active).map(k => '<option value="' + k + '">' + esc(CITY[k].name) + '</option>').join('');
   el('city').innerHTML = opts; el('city').value = KEY;
   el('g-city').innerHTML = opts; el('g-city').value = KEY;
 }
