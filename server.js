@@ -38,7 +38,7 @@ const check = (p, h) => {
 /* первичное заполнение: 10 территорий и три кабинета, пароль 1234 */
 if (!db.prepare('SELECT count(*) n FROM cities').get().n) {
   const ins = db.prepare('INSERT INTO cities (key, name, pass, active) VALUES (?, ?, ?, ?)');
-  for (let i = 1; i <= 10; i++) ins.run('city' + i, 'Город ' + i, hash('1234'), i <= 4 ? 1 : 0);
+  for (let i = 1; i <= 20; i++) ins.run('city' + i, 'Город ' + i, hash('1234'), i <= 4 ? 1 : 0);  // 20 адресов, открыты первые четыре
   const insRole = db.prepare('INSERT INTO roles (role, pass) VALUES (?, ?)');
   for (const r of ['crd', 'mgr', 'spec']) insRole.run(r, hash('1234'));
 }
