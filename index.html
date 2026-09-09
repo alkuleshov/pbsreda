@@ -379,6 +379,10 @@ function enter(){
     target = r === 'crd' ? 'cur.html' : r === 'mgr' ? 'man.html' : 'spec.html';
   }
   if (p !== need){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
+  try {
+    localStorage.setItem('pbsreda-auth-v1', JSON.stringify(
+      TAB === 'adm' ? {role:'adm', key:el('g-city').value, ts:Date.now()} : {role:el('b-role').value, ts:Date.now()}));
+  } catch (e) {}
   try { location.href = target; } catch (err) {}
   setTimeout(() => { el('g-err').textContent = 'Страница ' + target + ' не открылась — откройте файл вручную'; }, 1500);
 }

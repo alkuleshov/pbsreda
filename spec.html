@@ -285,6 +285,8 @@ body.locked{overflow:hidden}
 .tile .thumb{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
 .tile .thumb::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.72)}
 .tile.done{border-color:var(--green);background:var(--green-pale)}
+.tile.ret{border-color:#D08A12;background:#FDF4E3;box-shadow:inset 0 0 0 1px #D08A12}
+.tile .ret-mark{position:absolute;left:5px;bottom:4px;z-index:3;font-size:11px;color:#9A6208;font-weight:700}
 .tile.file:not(.done){border-color:var(--green-soft)}
 .tile .mark{position:absolute;right:5px;bottom:4px;z-index:3;font-size:10px;color:var(--green-dark);font-weight:700}
 .tile .clip{position:absolute;right:6px;top:5px;z-index:3;font-size:10px;color:var(--ink-3)}
@@ -298,6 +300,15 @@ body.locked{overflow:hidden}
 .modal-c .prev img{display:block;max-width:100%;max-height:260px;margin:0 auto;border-radius:2px}
 .modal-c .acts{margin-top:0}
 .modal-c .close{margin-left:auto}
+.modal-c .prev img{cursor:zoom-in}
+.retbox{border:1px solid #E7D3A8;border-left:3px solid #D08A12;background:#FDF4E3;border-radius:var(--r);
+  padding:10px 12px;margin-bottom:14px;font-size:13px;line-height:1.45}
+.retbox b{font-weight:600}
+.modal-c textarea{width:100%;border:1px solid var(--line);border-radius:var(--r);padding:8px 11px;min-height:60px;resize:vertical;margin-bottom:12px}
+.light{position:fixed;inset:0;background:rgba(23,33,27,.92);z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px}
+.light[hidden]{display:none}
+.light img{max-width:100%;max-height:calc(100vh - 120px);object-fit:contain}
+.light .lacts{display:flex;gap:10px}
 @media (max-width:900px){.tiles{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}.bstat{margin-left:0}}
 </style>
 
@@ -392,6 +403,14 @@ body.locked{overflow:hidden}
   </div>
 </div>
 
+<div class="light" id="light" hidden>
+  <img id="l-img" alt="">
+  <div class="lacts">
+    <a class="btn btn-main" id="l-get" download>Скачать файл</a>
+    <button class="btn" id="l-close" style="background:#fff">Закрыть</button>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -426,8 +445,9 @@ function saveBoard(){
 loadBoard();
 
 let ROLE = PAGE.role, KEY = KEYS[0], OPEN = null;
-const cell = id => { WORK[KEY] = WORK[KEY] || {}; return WORK[KEY][id] = WORK[KEY][id] || {done:false, file:'', img:''}; };
-const cellOf = id => (WORK[KEY] && WORK[KEY][id]) || {done:false, file:'', img:''};
+const cell = id => { WORK[KEY] = WORK[KEY] || {}; return WORK[KEY][id] = WORK[KEY][id] || {done:false, file:'', img:'', ret:false, note:''}; };
+const cellOf = id => (WORK[KEY] && WORK[KEY][id]) || {done:false, file:'', img:'', ret:false, note:''};
+const ORIG = {};   // оригиналы файлов на время сессии
 const canEdit = () => ROLE === 'spec';
 
 /* ---------- доска ---------- */
@@ -438,13 +458,14 @@ function render(){
     const tiles = s.tiles.map(t => {
       const c = cellOf(t.id);
       all++; if (c.done){ done++; d++; } if (c.file) withFile++;
-      return '<button class="tile' + (c.done ? ' done' : '') + (c.file ? ' file' : '') + '" data-t="' + t.id + '" title="' +
+      return '<button class="tile' + (c.done ? ' done' : '') + (c.ret ? ' ret' : '') + (c.file ? ' file' : '') + '" data-t="' + t.id + '" title="' +
         esc(t.n + ' · ' + t.t) + '">' +
         (c.img ? '<span class="thumb" style="background-image:url(' + c.img + ')"></span>' : '') +
         '<span class="num">' + esc(t.n) + '</span>' +
         '<span class="nm">' + esc(t.t) + '</span>' +
         (c.file && !c.img ? '<span class="clip">файл</span>' : '') +
         (c.done ? '<span class="mark">✓</span>' : '') +
+        (c.ret ? '<span class="ret-mark">!</span>' : '') +
         '</button>';
     }).join('');
     html += '<section class="bsec"><div class="bsec-h"><h2>' + esc(s.title) + '</h2><span>' +
@@ -453,7 +474,9 @@ function render(){
   el('board').innerHTML = html;
   el('b-done').textContent = done;
   el('b-all').textContent = all;
-  el('b-files').textContent = withFile + ' с файлами';
+  let ret = 0;
+  BOARD.forEach(s => s.tiles.forEach(t => { if (cellOf(t.id).ret) ret++; }));
+  el('b-files').textContent = withFile + ' с файлами' + (ret ? ' · ' + ret + ' на доработке' : '');
   el('b-bar').style.width = Math.round(done / all * 100) + '%';
 }
 
@@ -466,18 +489,38 @@ function tileById(id){
 function openTile(id){
   OPEN = id;
   const t = tileById(id), c = cellOf(id);
+  const orig = ORIG[KEY + '|' + id];
   el('m-name').textContent = t.t;
-  el('m-num').textContent = 'Пункт заявки ' + t.n + ' · ' + (c.done ? 'готово' : 'в работе');
-  el('m-prev').innerHTML = c.img ? '<img src="' + c.img + '" alt="">'
-    : c.file ? 'Загружен файл: <b>' + esc(c.file) + '</b>' : 'Файл ещё не загружен';
+  el('m-num').textContent = 'Пункт заявки ' + t.n + ' · ' +
+    (c.ret ? 'вернули в работу' : c.done ? 'готово' : 'в работе');
+  el('m-prev').innerHTML =
+    (c.ret && c.note ? '<div class="retbox"><b>Менеджер вернул в работу:</b> ' + esc(c.note) + '</div>' : '') +
+    (c.img ? '<img src="' + c.img + '" alt="" id="m-img">'
+      : c.file ? 'Загружен файл: <b>' + esc(c.file) + '</b>' : 'Файл ещё не загружен');
+  const view = c.file
+    ? '<button class="btn" id="m-open">Открыть во весь экран</button>' +
+      '<a class="btn" id="m-get" download="' + esc(c.file) + '" href="' + (orig ? orig.url : c.img || '#') + '">Скачать</a>'
+    : '';
   el('m-acts').innerHTML = canEdit()
-    ? '<button class="btn btn-main" id="m-up">' + (c.file ? 'Заменить файл' : 'Загрузить файл') + '</button>' +
+    ? '<button class="btn btn-main" id="m-up">' + (c.file ? 'Заменить файл' : 'Загрузить файл') + '</button>' + view +
       '<button class="btn" id="m-done">' + (c.done ? 'Вернуть в работу' : 'Отметить готово') + '</button>' +
       (c.file ? '<button class="btn" id="m-del">Убрать файл</button>' : '') +
       '<button class="btn close" id="m-close">Закрыть</button>'
-    : '<span class="hint">Менеджер видит прогресс, файлы загружает специалист</span>' +
+    : view +
+      '<button class="btn" id="m-ret">Вернуть в работу</button>' +
       '<button class="btn close" id="m-close">Закрыть</button>';
+  if (!canEdit()) el('m-acts').insertAdjacentHTML('beforebegin',
+    '<textarea id="m-note" placeholder="Что нужно поправить — увидит специалист">' + esc(c.note) + '</textarea>');
   el('modal').hidden = false;
+}
+function showLight(){
+  const c = cellOf(OPEN), orig = ORIG[KEY + '|' + OPEN];
+  if (!c.file) return;
+  el('l-img').src = c.img || '';
+  el('l-img').hidden = !c.img;
+  el('l-get').href = orig ? orig.url : (c.img || '#');
+  el('l-get').download = c.file;
+  el('light').hidden = false;
 }
 function closeTile(){ el('modal').hidden = true; OPEN = null; }
 
@@ -506,18 +549,28 @@ function toast(t){ const x = el('toast'); x.textContent = t; x.classList.add('on
 document.addEventListener('click', e => {
   const tile = e.target.closest('[data-t]');
   if (tile) return openTile(tile.dataset.t);
-  const b = e.target.closest('#m-up,#m-done,#m-del,#m-close');
+  if (e.target.id === 'm-img') return showLight();
+  if (e.target.id === 'l-close' || e.target.id === 'light'){ el('light').hidden = true; return; }
+  const b = e.target.closest('#m-up,#m-done,#m-del,#m-close,#m-open,#m-ret');
   if (!b) { if (e.target.id === 'modal') closeTile(); return; }
   if (b.id === 'm-close') return closeTile();
+  if (b.id === 'm-open') return showLight();
   const c = cell(OPEN);
-  if (b.id === 'm-done'){ c.done = !c.done; saveBoard(); render(); openTile(OPEN); return; }
+  if (b.id === 'm-ret'){
+    const txt = (el('m-note').value || '').trim();
+    if (!txt){ toast('Напишите, что поправить — специалист увидит текст'); el('m-note').focus(); return; }
+    c.ret = true; c.done = false; c.note = txt;
+    saveBoard(); render(); openTile(OPEN); toast('Лист вернули в работу'); return;
+  }
+  if (b.id === 'm-done'){ c.done = !c.done; if (c.done){ c.ret = false; c.note = ''; } saveBoard(); render(); openTile(OPEN); return; }
   if (b.id === 'm-del'){ c.file = ''; c.img = ''; saveBoard(); render(); openTile(OPEN); return; }
   if (b.id === 'm-up'){
     const inp = document.createElement('input'); inp.type = 'file';
     inp.onchange = () => {
       const f = inp.files[0]; if (!f) return;
+      ORIG[KEY + '|' + OPEN] = {url: URL.createObjectURL(f), name: f.name};
       shrink(f, img => {
-        c.file = f.name; c.img = img;
+        c.file = f.name; c.img = img; c.ret = false;
         saveBoard(); render(); openTile(OPEN);
         toast(img ? 'Изображение легло на доску' : 'Файл прикреплён');
       });
@@ -525,7 +578,11 @@ document.addEventListener('click', e => {
     inp.click();
   }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !el('modal').hidden) closeTile(); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!el('light').hidden){ el('light').hidden = true; return; }
+  if (!el('modal').hidden) closeTile();
+});
 
 /* ---------- территория и роль ---------- */
 function fillCities(){
@@ -553,6 +610,16 @@ if (KEYS.includes(hs)) KEY = hs;
 applyRole();
 
 /* ---------- вход и выход ---------- */
+/* ---------- вход помнится между страницами сайта ---------- */
+const AKEY = 'pbsreda-auth-v1';
+function setAuth(o){ try { localStorage.setItem(AKEY, JSON.stringify(Object.assign({ts: Date.now()}, o))); } catch (e) {} }
+function clearAuth(){ try { localStorage.removeItem(AKEY); } catch (e) {} }
+function readAuth(){ try { return JSON.parse(localStorage.getItem(AKEY) || 'null'); } catch (e) { return null; } }
+function authOk(){
+  const a = readAuth();
+  if (!a || Date.now() - a.ts > 12 * 3600 * 1000) return false;
+  return ROLE === 'adm' ? (a.role === 'adm' && a.key === KEY) : a.role === ROLE;
+}
 let TAB = 'bur';
 function setTab(r){
   TAB = r;
@@ -577,10 +644,11 @@ function enter(){
   if (TAB === 'adm'){
     const k = el('g-city').value;
     if (p !== CITY[k].pass){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
-    go(k); return;
+    setAuth({role:'adm', key:k}); go(k); return;
   }
   const r = el('b-role').value;
   if (p !== PASS[r]){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
+  setAuth({role:r});
   if (r === ROLE){ el('gate').hidden = true; document.body.classList.remove('locked'); window.scrollTo(0, 0); applyRole(); return; }
   go(r === 'crd' ? 'cur' : r === 'mgr' ? 'man' : 'spec');
 }
@@ -588,6 +656,7 @@ el('g-go').onclick = enter;
 el('g-pass').onkeydown = e => { if (e.key === 'Enter') enter(); };
 el('logout').onclick = () => {
   if (!confirm('Вы уверены, что хотите выйти?')) return;
+  clearAuth();
   try { location.href = 'index.html'; } catch (err) {}
   setTimeout(showGate, 400);
 };
@@ -601,7 +670,8 @@ function showGate(){
   window.scrollTo(0, 0);
   el('g-pass').focus();
 }
-showGate();
+if (authOk()){ el('gate').hidden = true; document.body.classList.remove('locked'); }
+else showGate();
 </script>
 
 </body>

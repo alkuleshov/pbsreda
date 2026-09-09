@@ -818,6 +818,16 @@ window.addEventListener('storage', e => {
 });
 
 /* ---------- вход и выход ---------- */
+/* ---------- вход помнится между страницами сайта ---------- */
+const AKEY = 'pbsreda-auth-v1';
+function setAuth(o){ try { localStorage.setItem(AKEY, JSON.stringify(Object.assign({ts: Date.now()}, o))); } catch (e) {} }
+function clearAuth(){ try { localStorage.removeItem(AKEY); } catch (e) {} }
+function readAuth(){ try { return JSON.parse(localStorage.getItem(AKEY) || 'null'); } catch (e) { return null; } }
+function authOk(){
+  const a = readAuth();
+  if (!a || Date.now() - a.ts > 12 * 3600 * 1000) return false;
+  return ROLE === 'adm' ? (a.role === 'adm' && a.key === KEY) : a.role === ROLE;
+}
 let TAB = 'adm';
 function setTab(r){
   TAB = r;
@@ -843,11 +853,13 @@ function enter(){
   if (TAB === 'adm'){
     const k = el('g-city').value;
     if (p !== CITY[k].pass){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
+    setAuth({role:'adm', key:k});
     if (k === KEY && ROLE === 'adm'){ hideGate(); return; }
     go(k); return;
   }
   const r = el('b-role').value;
   if (p !== PASS[r]){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
+  setAuth({role:r});
   if (r === ROLE){ hideGate(); return; }
   go(r === 'crd' ? 'cur' : r === 'mgr' ? 'man' : 'spec');
 }
@@ -867,6 +879,7 @@ el('logout').onclick = () => {
       ? 'Вы уверены, что хотите выйти? Загруженные файлы уже у бюро, ничего не потеряется.'
       : 'Вы уверены, что хотите выйти?';
   if (!confirm(msg)) return;
+  clearAuth();
   try { location.href = 'index.html'; } catch (err) {}
   setTimeout(showGate, 400);
 };
@@ -885,7 +898,8 @@ function showGate(){
   window.scrollTo(0, 0);
   el('g-pass').focus();
 }
-showGate();
+if (authOk()){ el('gate').hidden = true; document.body.classList.remove('locked'); }
+else showGate();
 </script>
 </body>
 </html>
