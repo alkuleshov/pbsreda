@@ -502,7 +502,55 @@ function saveBoard(){
 loadBoard();
 
 let ROLE = PAGE.role, KEY = KEYS[0], OPEN = null;
-const ORIG = {};
+const ORIG = {};   // ссылки на оригиналы в этой вкладке
+
+/* оригиналы файлов лежат в браузерной базе — их видят все страницы сайта */
+const FDB = 'pbsreda-files';
+let dbp = null;
+function fdb(){
+  if (dbp) return dbp;
+  dbp = new Promise((res, rej) => {
+    try {
+      const r = indexedDB.open(FDB, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('files');
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    } catch (e) { rej(e); }
+  }).catch(() => null);
+  return dbp;
+}
+async function putFile(key, file){
+  const d = await fdb(); if (!d) return false;
+  return new Promise(res => {
+    try {
+      const t = d.transaction('files', 'readwrite');
+      t.objectStore('files').put(file, key);
+      t.oncomplete = () => res(true); t.onerror = () => res(false);
+    } catch (e) { res(false); }
+  });
+}
+async function getFile(key){
+  const d = await fdb(); if (!d) return null;
+  return new Promise(res => {
+    try {
+      const q = d.transaction('files').objectStore('files').get(key);
+      q.onsuccess = () => res(q.result || null); q.onerror = () => res(null);
+    } catch (e) { res(null); }
+  });
+}
+async function delFile(key){
+  const d = await fdb(); if (!d) return;
+  try { d.transaction('files', 'readwrite').objectStore('files').delete(key); } catch (e) {}
+}
+/* достаём оригинал: сперва из вкладки, потом из браузерной базы */
+async function ensureOrig(id){
+  const key = KEY + '|' + id;
+  if (ORIG[key]) return ORIG[key];
+  const f = await getFile(key);
+  if (!f) return null;
+  ORIG[key] = {url: URL.createObjectURL(f), name: f.name || cellOf(id).file};
+  return ORIG[key];
+}
 const blank = () => ({st:'work', file:'', img:'', note:''});
 const cell = id => { WORK[KEY] = WORK[KEY] || {}; return WORK[KEY][id] = WORK[KEY][id] || blank(); };
 const cellOf = id => (WORK[KEY] && WORK[KEY][id]) || blank();
@@ -572,12 +620,23 @@ function openTile(id){
       (c.note ? '<button class="btn" id="m-unret">Снять замечание</button>' : '') +
       '<button class="btn close" id="m-close">Закрыть</button>';
   el('modal').hidden = false;
+  if (c.file && !orig) ensureOrig(id).then(o => {
+    if (o && OPEN === id && el('m-get')) el('m-get').href = o.url;
+  });
 }
 function closeTile(){ el('modal').hidden = true; OPEN = null; }
 
-function showLight(){
-  const c = cellOf(OPEN), orig = ORIG[KEY + '|' + OPEN];
+async function showLight(){
+  const id = OPEN, c = cellOf(id);
   if (!c.file) return;
+  el('l-msg').hidden = false;
+  el('l-msg').textContent = 'Загружаем оригинал…';
+  el('l-img').hidden = true;
+  el('l-name').textContent = c.file;
+  el('modal').hidden = true;
+  el('light').hidden = false;
+  const orig = await ensureOrig(id);
+  if (OPEN !== id) return;
   const full = orig && /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(c.file) ? orig.url : '';
   const src = full || c.img;
   el('l-img').hidden = !src;
@@ -585,11 +644,9 @@ function showLight(){
   if (src) el('l-img').src = src;
   el('l-msg').hidden = !!src;
   el('l-msg').textContent = src ? '' : 'Это не изображение — файл можно скачать и открыть в своей программе.';
-  el('l-name').textContent = c.file + (full ? '' : ' · показана уменьшенная копия, оригинал доступен по кнопке «Скачать»');
+  el('l-name').textContent = c.file + (full ? '' : ' · оригинал доступен только по кнопке «Скачать»');
   el('l-get').href = orig ? orig.url : (c.img || '#');
   el('l-get').download = c.file;
-  el('modal').hidden = true;                  // карточка не мешает просмотру
-  el('light').hidden = false;
 }
 function hideLight(){
   el('light').hidden = true;
@@ -645,12 +702,18 @@ document.addEventListener('click', e => {
     if (c.st === 'done') c.note = '';
     saveBoard(); render(); openTile(OPEN); return;
   }
-  if (b.id === 'm-del'){ c.file = ''; c.img = ''; saveBoard(); render(); openTile(OPEN); return; }
+  if (b.id === 'm-del'){
+    const fkey = KEY + '|' + OPEN;
+    delFile(fkey); delete ORIG[fkey];
+    c.file = ''; c.img = ''; saveBoard(); render(); openTile(OPEN); return;
+  }
   if (b.id === 'm-up'){
     const inp = document.createElement('input'); inp.type = 'file';
     inp.onchange = () => {
       const f = inp.files[0]; if (!f) return;
-      ORIG[KEY + '|' + OPEN] = {url: URL.createObjectURL(f), name: f.name};
+      const fkey = KEY + '|' + OPEN;
+      ORIG[fkey] = {url: URL.createObjectURL(f), name: f.name};
+      putFile(fkey, f);
       shrink(f, img => {
         c.file = f.name; c.img = img;
         if (c.st === 'ret') c.st = 'fix';
