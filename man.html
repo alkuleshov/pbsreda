@@ -343,10 +343,14 @@ body.locked{overflow:hidden}
   padding:10px 12px;margin-bottom:14px;font-size:13px;line-height:1.45}
 .fixbox{border:1px solid #C6DAF3;border-left:3px solid #1F6FD0;background:#EFF5FC;border-radius:var(--r);
   padding:10px 12px;margin-bottom:14px;font-size:13px;line-height:1.45}
-.light{position:fixed;inset:0;background:rgba(23,33,27,.92);z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px}
+.light{position:fixed;inset:0;background:rgba(23,33,27,.96);z-index:90;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:20px;gap:18px}
 .light[hidden]{display:none}
-.light img{max-width:100%;max-height:calc(100vh - 120px);object-fit:contain}
-.light .lacts{display:flex;gap:10px}
+.light img{max-width:96vw;max-height:calc(100vh - 130px);width:auto;height:auto;object-fit:contain;background:#fff;border-radius:2px}
+.light img.up{width:min(1180px,94vw)}
+.light .lmsg{color:#fff;font-size:15px;text-align:center;max-width:60ch;line-height:1.5}
+.light .lname{color:rgba(255,255,255,.7);font-size:12.5px}
+.light .lacts{display:flex;gap:10px;align-items:center}
 @media (max-width:900px){.tiles{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}.bstat{margin-left:0}}
 </style>
 
@@ -448,7 +452,9 @@ body.locked{overflow:hidden}
 </div>
 
 <div class="light" id="light" hidden>
+  <p class="lmsg" id="l-msg" hidden></p>
   <img id="l-img" alt="">
+  <p class="lname" id="l-name"></p>
   <div class="lacts">
     <a class="btn btn-main" id="l-get" download>Скачать файл</a>
     <button class="btn" id="l-close" style="background:#fff">Закрыть</button>
@@ -572,11 +578,22 @@ function closeTile(){ el('modal').hidden = true; OPEN = null; }
 function showLight(){
   const c = cellOf(OPEN), orig = ORIG[KEY + '|' + OPEN];
   if (!c.file) return;
-  el('l-img').src = c.img || '';
-  el('l-img').hidden = !c.img;
+  const full = orig && /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(c.file) ? orig.url : '';
+  const src = full || c.img;
+  el('l-img').hidden = !src;
+  el('l-img').className = full ? '' : 'up';   // уменьшенную копию растягиваем
+  if (src) el('l-img').src = src;
+  el('l-msg').hidden = !!src;
+  el('l-msg').textContent = src ? '' : 'Это не изображение — файл можно скачать и открыть в своей программе.';
+  el('l-name').textContent = c.file + (full ? '' : ' · показана уменьшенная копия, оригинал доступен по кнопке «Скачать»');
   el('l-get').href = orig ? orig.url : (c.img || '#');
   el('l-get').download = c.file;
+  el('modal').hidden = true;                  // карточка не мешает просмотру
   el('light').hidden = false;
+}
+function hideLight(){
+  el('light').hidden = true;
+  if (OPEN) openTile(OPEN);                   // возвращаемся в карточку листа
 }
 
 function shrink(file, cb){
@@ -602,7 +619,7 @@ function toast(t){ const x = el('toast'); x.textContent = t; x.classList.add('on
 
 document.addEventListener('click', e => {
   if (e.target.id === 'm-img') return showLight();
-  if (e.target.id === 'l-close' || e.target.id === 'light'){ el('light').hidden = true; return; }
+  if (e.target.id === 'l-close' || e.target.id === 'light' || e.target.id === 'l-img'){ hideLight(); return; }
   const tile = e.target.closest('[data-t]');
   if (tile) return openTile(tile.dataset.t);
   const b = e.target.closest('#m-up,#m-done,#m-del,#m-close,#m-open,#m-ret,#m-unret,#m-fix,#m-accept');
@@ -646,7 +663,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
-  if (!el('light').hidden){ el('light').hidden = true; return; }
+  if (!el('light').hidden){ hideLight(); return; }
   if (!el('modal').hidden) closeTile();
 });
 
