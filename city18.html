@@ -1,4 +1,4 @@
-<!-- сборка 2026-09-10-8 -->
+<!-- сборка 2026-09-10-9 -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -79,6 +79,7 @@ body.locked{overflow:hidden}
 .tabs button{flex:1;border:0;background:#fff;padding:9px 6px;font-size:13px;cursor:pointer;color:var(--ink-2)}
 .tabs button+button{border-left:1px solid var(--line)}
 .tabs button[aria-selected="true"]{background:var(--ink);color:#fff;font-weight:600}
+.gate-h{font-size:18px;font-weight:700;margin:0 0 6px}
 .gate-card p.sub{margin:0 0 20px;color:var(--ink-2);font-size:13.5px;line-height:1.45}
 .gate .f{margin-bottom:14px}
 .gate select,.gate input{width:100%;border:1px solid var(--line);border-radius:var(--r);padding:10px 11px}
@@ -335,22 +336,11 @@ body.locked{overflow:hidden}
         <div class="cta"><a class="btn btn-main" href="index.html">Подать заявку на сопровождение</a></div>
       </div>
       <div class="gate-card">
-        <div class="tabs" role="tablist">
-          <button id="tab-adm" role="tab" aria-selected="true">Администрация</button>
-          <button id="tab-bur" role="tab" aria-selected="false">Бюро</button>
-        </div>
-        <p class="sub" id="g-sub">Раздел для администраций городов, с которыми бюро готовит заявку.</p>
-        <div class="f" id="g-city-f">
-          <label for="g-login">Логин территории</label>
-          <input id="g-login" autocomplete="username" placeholder="например, city1">
-        </div>
-        <div class="f" id="b-role-f" hidden>
-          <label for="b-role">Кабинет</label>
-          <select id="b-role">
-            <option value="crd">Куратор</option>
-            <option value="mgr">Менеджер</option>
-            <option value="spec">Специалист</option>
-          </select>
+        <h2 class="gate-h">Вход</h2>
+        <p class="sub" id="g-sub">Введите логин и пароль — сайт сам откроет ваш раздел.</p>
+        <div class="f">
+          <label for="g-login">Логин</label>
+          <input id="g-login" autocomplete="username" placeholder="логин, который выдал куратор">
         </div>
         <div class="f">
           <label for="g-pass">Пароль</label>
@@ -358,7 +348,7 @@ body.locked{overflow:hidden}
         </div>
         <p class="err" id="g-err"></p>
         <button class="btn btn-main" id="g-go">Войти</button>
-        <p class="foot-note">Не подходит пароль — напишите куратору бюро. Каждая территория видит только свои документы и свою папку на диске.</p>
+        <p class="foot-note">Не подходят логин или пароль — напишите куратору бюро. Каждая территория видит только свои документы и свою папку на диске.</p>
       </div>
     </div>
   </div>
@@ -479,6 +469,24 @@ let DRAFT = JSON.parse(JSON.stringify(CITY));
 const cityDirty = k => JSON.stringify(DRAFT[k]) !== JSON.stringify(CITY[k]);
 const anyDirty = () => KEYS.some(cityDirty);
 
+/* учётные записи сотрудников бюро — хранятся вместе с настройками территорий */
+const STKEY = 'pbsreda-staff-v1';
+const STAFF_DEF = [
+  {login:'cur',  pass:'1234', role:'crd',  name:'Куратор бюро'},
+  {login:'man',  pass:'1234', role:'mgr',  name:'Менеджер бюро'},
+  {login:'spec', pass:'1234', role:'spec', name:'Специалист бюро'}
+];
+let STAFF = [];
+function loadStaff(){
+  try {
+    const raw = JSON.parse(localStorage.getItem(STKEY) || 'null');
+    STAFF = Array.isArray(raw) && raw.length ? raw.filter(u => u && u.login) : STAFF_DEF.map(u => Object.assign({}, u));
+  } catch (e) { STAFF = STAFF_DEF.map(u => Object.assign({}, u)); }
+}
+function saveStaff(){ try { localStorage.setItem(STKEY, JSON.stringify(STAFF)); return true; } catch (e) { return false; } }
+loadStaff();
+const PAGEOF = {crd:'cur', mgr:'man', spec:'spec'};
+
 const STATE = {};
 KEYS.forEach(k => {
   STATE[k] = [];
@@ -566,8 +574,23 @@ function renderSettings(){
           '<span class="hint">Свободных адресов: ' + KEYS.filter(k => !CITY[k].active && !CITY[k].closedAt).length + '</span>'
         : '<span class="hint">Все десять адресов заняты. Освободите один, чтобы добавить новую территорию.</span>') +
     '</div>' +
-    '<p class="hint" style="margin:12px 0 0">Пароль кабинетов бюро: куратор, менеджер и специалист входят по своим паролям — их меняем на этапе подключения базы.</p>' +
+    staffEditor() +
     '</div></div>';
+}
+function staffEditor(){
+  const roles = {crd:'Куратор', mgr:'Менеджер', spec:'Специалист'};
+  return '<div class="closed"><h4>Сотрудники бюро — логины и пароли</h4>' +
+    STAFF.map((u, i) =>
+      '<div class="prow"><input data-staff="' + i + '|name" value="' + esc(u.name || '') + '" placeholder="Имя">' +
+      '<input data-staff="' + i + '|login" value="' + esc(u.login || '') + '" placeholder="Логин" style="max-width:160px">' +
+      '<input data-staff="' + i + '|pass" value="' + esc(u.pass || '') + '" placeholder="Пароль" style="max-width:160px">' +
+      '<select data-staff="' + i + '|role" style="max-width:150px">' +
+        Object.keys(roles).map(r => '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + roles[r] + '</option>').join('') +
+      '</select>' +
+      '<button class="btn btn-no" data-staffrm="' + i + '">Убрать</button></div>').join('') +
+    '<div class="acts"><button class="btn" data-staffadd="1">Добавить сотрудника</button>' +
+    '<button class="btn btn-main" id="staff-save" data-staffsave="1">Сохранить сотрудников</button>' +
+    '<span class="hint">Логин определяет раздел: куратор, менеджер или специалист</span></div></div>';
 }
 function planEditor(k){
   const list = DRAFT[k].plan || [];
@@ -914,7 +937,8 @@ function addFiles(i, list){
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-sec],#tpl-toggle,#set-toggle,[data-gen],[data-copy],[data-tget],[data-tput],' +
     '[data-open],[data-del],[data-go],[data-drive],[data-drop],[data-ok],[data-unok],[data-back],[data-done],[data-save],' +
-    '[data-add],[data-reopen],[data-purge],[data-planadd],[data-planrm],#d-cancel,#d-create,#d-del,#d-purge,.chip');
+    '[data-add],[data-reopen],[data-purge],[data-planadd],[data-planrm],[data-staffadd],[data-staffrm],[data-staffsave],' +
+    '#d-cancel,#d-create,#d-del,#d-purge,.chip');
   if (!t) return;
   const d = t.dataset;
 
@@ -961,6 +985,23 @@ document.addEventListener('click', e => {
     chips(); render(); reopen(i); toast('Возвращено на доработку'); return;
   }
   if (d.done !== undefined){ const i = +d.done; items[i].done = !items[i].done; chips(); render(); reopen(i); return; }
+  if (d.staffadd !== undefined){
+    STAFF.push({login:'', pass:'1234', role:'spec', name:''});
+    renderSettings(); return;
+  }
+  if (d.staffrm !== undefined){
+    if (STAFF.length < 2){ toast('Должен остаться хотя бы один сотрудник'); return; }
+    STAFF.splice(+d.staffrm, 1); saveStaff(); renderSettings(); toast('Сотрудник убран'); return;
+  }
+  if (d.staffsave !== undefined){
+    const bad = STAFF.find(u => !String(u.login || '').trim() || !String(u.pass || '').trim());
+    if (bad){ toast('У каждого сотрудника должны быть логин и пароль'); return; }
+    const logins = STAFF.map(u => u.login.trim().toLowerCase());
+    if (new Set(logins).size !== logins.length){ toast('Логины не должны повторяться'); return; }
+    const busy = logins.find(l => KEYS.some(k => String(CITY[k].login || '').toLowerCase() === l));
+    if (busy){ toast('Логин «' + busy + '» уже занят территорией'); return; }
+    saveStaff(); renderSettings(); toast('Сотрудники сохранены'); return;
+  }
   if (d.planadd !== undefined){
     const k = d.planadd;
     DRAFT[k].plan = (DRAFT[k].plan || []).concat([{d:'', t:''}]);
@@ -1023,6 +1064,11 @@ document.addEventListener('input', e => {
   else if (d.note !== undefined) items[+d.note].note = e.target.value;
   else if (d.backtext !== undefined) items[+d.backtext].back = e.target.value;
   else if (d.dl !== undefined) items[+d.dl].deadline = e.target.value;
+  else if (d.staff !== undefined){
+    const [i, f] = d.staff.split('|');
+    STAFF[+i][f] = e.target.value;
+    const b = el('staff-save'); if (b) b.disabled = false;
+  }
   else if (d.plan !== undefined){
     const [k, i, f] = d.plan.split('|');
     DRAFT[k].plan[+i][f] = e.target.value;
@@ -1037,7 +1083,14 @@ document.addEventListener('input', e => {
   else if (e.target.id === 'q'){ query = e.target.value; render(); }
 });
 
-document.addEventListener('change', e => { if (e.target.id === 'd-ack') dropCheck(); });
+document.addEventListener('change', e => {
+  if (e.target.id === 'd-ack') return dropCheck();
+  const d = e.target.dataset;
+  if (d.staff !== undefined){
+    const [i, f] = d.staff.split('|');
+    STAFF[+i][f] = e.target.value;
+  }
+});
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !el('dlg').hidden) dlgClose(); });
 
 document.addEventListener('dragover', e => { const z = e.target.closest('.drop'); if (!z) return; e.preventDefault(); z.classList.add('over'); });
@@ -1116,41 +1169,26 @@ function authOk(){
   if (!a || Date.now() - a.ts > 12 * 3600 * 1000) return false;
   return ROLE === 'adm' ? (a.role === 'adm' && a.key === KEY) : a.role === ROLE;
 }
-let TAB = 'adm';
-function setTab(r){
-  TAB = r;
-  el('tab-adm').setAttribute('aria-selected', r === 'adm');
-  el('tab-bur').setAttribute('aria-selected', r === 'bur');
-  el('g-city-f').hidden = r !== 'adm';
-  el('b-role-f').hidden = r !== 'bur';
-  el('g-sub').textContent = r === 'bur'
-    ? 'Кабинеты бюро: куратор принимает документы, менеджер видит картину целиком, специалист — сроки по своим материалам.'
-    : 'Раздел для администраций городов, с которыми бюро готовит заявку.';
-  el('g-err').textContent = '';
+function findAccount(login, pass){
+  const lg = String(login || '').trim().toLowerCase();
+  const k = KEYS.find(x => CITY[x].active && String(CITY[x].login || '').toLowerCase() === lg);
+  if (k) return CITY[k].pass === pass ? {role:'adm', key:k} : null;
+  const u = STAFF.find(x => String(x.login || '').toLowerCase() === lg);
+  if (u) return u.pass === pass ? {role:u.role} : null;
+  return null;
 }
-el('tab-adm').onclick = () => setTab('adm');
-el('tab-bur').onclick = () => setTab('bur');
-
 function go(page){
   try { location.href = page + '.html'; } catch (err) {}
   setTimeout(() => { el('g-err').textContent = 'Страница /' + page + ' не открылась — откройте файл вручную'; }, 1200);
 }
 function enter(){
-  const p = el('g-pass').value.trim();
-  if (!p){ el('g-err').textContent = 'Введите пароль'; el('g-pass').focus(); return; }
-  if (TAB === 'adm'){
-    const lg = (el('g-login').value || '').trim().toLowerCase();
-    const k = KEYS.find(x => CITY[x].active && (CITY[x].login || '').toLowerCase() === lg);
-    if (!k || p !== CITY[k].pass){ el('g-err').textContent = 'Логин или пароль не подходят'; el('g-pass').select(); return; }
-    setAuth({role:'adm', key:k});
-    if (k === KEY && ROLE === 'adm'){ hideGate(); return; }
-    go(k); return;
-  }
-  const r = el('b-role').value;
-  if (p !== PASS[r]){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
-  setAuth({role:r});
-  if (r === ROLE){ hideGate(); return; }
-  go(r === 'crd' ? 'cur' : r === 'mgr' ? 'man' : 'spec');
+  const lg = el('g-login').value.trim(), p = el('g-pass').value.trim();
+  if (!lg || !p){ el('g-err').textContent = 'Введите логин и пароль'; el(lg ? 'g-pass' : 'g-login').focus(); return; }
+  const acc = findAccount(lg, p);
+  if (!acc){ el('g-err').textContent = 'Логин или пароль не подходят'; el('g-pass').select(); return; }
+  setAuth(acc.role === 'adm' ? {role:'adm', key:acc.key} : {role:acc.role});
+  if (acc.role === ROLE && (acc.role !== 'adm' || acc.key === KEY)){ ROLE = acc.role; hideGate(); return; }
+  go(acc.role === 'adm' ? acc.key : PAGEOF[acc.role]);
 }
 function hideGate(){
   el('gate').hidden = true;
@@ -1174,20 +1212,18 @@ el('logout').onclick = () => {
 };
 function showGate(){
   el('g-pass').value = ''; el('g-err').textContent = '';
-  fillCities();
   el('g-login').value = ROLE === 'adm' ? (info().login || '') : '';
-  el('b-role').value = ROLE === 'adm' ? 'crd' : ROLE;
-  setTab(ROLE === 'adm' ? 'adm' : 'bur');
   el('g-sub').textContent = ROLE === 'adm'
-    ? 'Страница территории «' + info().name + '». Введите пароль, который выдал куратор бюро.'
-    : 'Кабинет: ' + ROLE_NAME[ROLE] + '. Введите пароль.';
+    ? 'Страница территории «' + info().name + '». Введите логин и пароль, которые выдал куратор.'
+    : 'Кабинет: ' + ROLE_NAME[ROLE] + '. Введите логин и пароль.';
   document.body.classList.remove('crd');
   el('gate').hidden = false;
   document.body.classList.add('locked');
   el('gate').scrollTop = 0;
   window.scrollTo(0, 0);
-  el('g-pass').focus();
+  el('g-login').focus();
 }
+
 if (authOk()){ el('gate').hidden = true; document.body.classList.remove('locked'); }
 else showGate();
 </script>

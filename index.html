@@ -1,4 +1,4 @@
-<!-- сборка 2026-09-10-8 -->
+<!-- сборка 2026-09-10-9 -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -273,6 +273,7 @@ body.locked{overflow:hidden}
 .req-form[hidden]{display:none}
 .req-form .acts{margin-top:16px}
 .logins{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:44px}
+.gate-h{font-size:18px;font-weight:700;margin:0 0 6px}
 .gate-card h2{font-size:17px;font-weight:700;margin:0 0 6px}
 .logins .tabs{margin:0 0 14px}
 @media (max-width:760px){.logins{grid-template-columns:1fr}}
@@ -299,22 +300,11 @@ body.locked{overflow:hidden}
         <div class="cta"><button class="btn btn-main" id="req-open">Подать заявку на сопровождение</button></div>
       </div>
       <div class="gate-card">
-        <div class="tabs" role="tablist">
-          <button id="tab-adm" role="tab" aria-selected="true">Администрация</button>
-          <button id="tab-bur" role="tab" aria-selected="false">Бюро</button>
-        </div>
-        <p class="sub" id="g-sub">Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт куратор бюро.</p>
-        <div class="f" id="g-city-f">
-          <label for="g-city">Территория</label>
-          <select id="g-city"></select>
-        </div>
-        <div class="f" id="b-role-f" hidden>
-          <label for="b-role">Кабинет</label>
-          <select id="b-role">
-            <option value="crd">Куратор</option>
-            <option value="mgr">Менеджер</option>
-            <option value="spec">Специалист</option>
-          </select>
+        <h2 class="gate-h">Вход</h2>
+        <p class="sub">Введите логин и пароль — сайт сам откроет ваш раздел: территорию или кабинет бюро.</p>
+        <div class="f">
+          <label for="g-login">Логин</label>
+          <input id="g-login" autocomplete="username" placeholder="логин, который выдал куратор">
         </div>
         <div class="f">
           <label for="g-pass">Пароль</label>
@@ -322,7 +312,7 @@ body.locked{overflow:hidden}
         </div>
         <p class="err" id="g-err"></p>
         <button class="btn btn-main" id="g-go">Войти</button>
-        <p class="foot-note">Не подходит пароль — напишите куратору: <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>. Каждая территория видит только свои документы и свою папку на диске.</p>
+        <p class="foot-note">Не подходят логин или пароль — напишите куратору бюро: <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>.</p>
       </div>
     </div>
     <div class="req-form" id="req-form" hidden>
@@ -355,53 +345,44 @@ body.locked{overflow:hidden}
 const el = id => document.getElementById(id);
 const KEYS = ['city1','city2','city3','city4','city5','city6','city7','city8','city9','city10','city11','city12','city13','city14','city15','city16','city17','city18','city19','city20'];
 const CITY = {};
-KEYS.forEach((k, i) => CITY[k] = {name:'Город ' + (i + 1), pass:'1234', active: i < 4});
+KEYS.forEach((k, i) => CITY[k] = {name:'Город ' + (i + 1), login:'city' + (i + 1), pass:'1234', active: i < 4});
 try {
   const raw = localStorage.getItem('pbsreda-cities-v1');
   if (raw){ const o = JSON.parse(raw); KEYS.forEach(k => { if (o[k]) Object.assign(CITY[k], o[k]); }); }
 } catch (e) {}
 
-const PASS_BUR = {crd:'1234', mgr:'1234', spec:'1234'};
-let TAB = 'adm';
+const STAFF_DEF = [
+  {login:'cur',  pass:'1234', role:'crd',  name:'Куратор бюро'},
+  {login:'man',  pass:'1234', role:'mgr',  name:'Менеджер бюро'},
+  {login:'spec', pass:'1234', role:'spec', name:'Специалист бюро'}
+];
+let STAFF = STAFF_DEF;
+try {
+  const raw = JSON.parse(localStorage.getItem('pbsreda-staff-v1') || 'null');
+  if (Array.isArray(raw) && raw.length) STAFF = raw.filter(u => u && u.login);
+} catch (e) {}
+const PAGEOF = {crd:'cur', mgr:'man', spec:'spec'};
 
-el('g-city').innerHTML = KEYS.filter(k => CITY[k].active).map(k =>
-  '<option value="' + k + '">' + CITY[k].name.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) + '</option>').join('');
-
-function setTab(r){
-  TAB = r;
-  el('tab-adm').setAttribute('aria-selected', r === 'adm');
-  el('tab-bur').setAttribute('aria-selected', r === 'bur');
-  el('g-city-f').hidden = r !== 'adm';
-  el('b-role-f').hidden = r !== 'bur';
-  el('g-sub').textContent = r === 'bur'
-    ? 'Кабинеты бюро: куратор принимает документы, менеджер видит картину целиком, специалист — сроки по своим материалам.'
-    : 'Раздел для администраций городов, с которыми бюро готовит заявку. Пароль выдаёт куратор бюро.';
-  el('g-err').textContent = '';
-}
 function enter(){
-  const p = el('g-pass').value.trim();
-  if (!p){ el('g-err').textContent = 'Введите пароль'; el('g-pass').focus(); return; }
-  let target, need;
-  if (TAB === 'adm'){
-    const k = el('g-city').value;
-    need = CITY[k].pass; target = k + '.html';
+  const lg = el('g-login').value.trim().toLowerCase(), p = el('g-pass').value.trim();
+  if (!lg || !p){ el('g-err').textContent = 'Введите логин и пароль'; el(lg ? 'g-pass' : 'g-login').focus(); return; }
+  let target = '', auth = null;
+  const k = KEYS.find(x => CITY[x].active && String(CITY[x].login || '').toLowerCase() === lg);
+  if (k){
+    if (CITY[k].pass !== p){ el('g-err').textContent = 'Логин или пароль не подходят'; el('g-pass').select(); return; }
+    target = k + '.html'; auth = {role:'adm', key:k, ts:Date.now()};
   } else {
-    const r = el('b-role').value;
-    need = PASS_BUR[r];
-    target = r === 'crd' ? 'cur.html' : r === 'mgr' ? 'man.html' : 'spec.html';
+    const u = STAFF.find(x => String(x.login || '').toLowerCase() === lg);
+    if (!u || u.pass !== p){ el('g-err').textContent = 'Логин или пароль не подходят'; el('g-pass').select(); return; }
+    target = PAGEOF[u.role] + '.html'; auth = {role:u.role, ts:Date.now()};
   }
-  if (p !== need){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
-  try {
-    localStorage.setItem('pbsreda-auth-v1', JSON.stringify(
-      TAB === 'adm' ? {role:'adm', key:el('g-city').value, ts:Date.now()} : {role:el('b-role').value, ts:Date.now()}));
-  } catch (e) {}
+  try { localStorage.setItem('pbsreda-auth-v1', JSON.stringify(auth)); } catch (e) {}
   try { location.href = target; } catch (err) {}
   setTimeout(() => { el('g-err').textContent = 'Страница ' + target + ' не открылась — откройте файл вручную'; }, 1500);
 }
 el('g-go').onclick = enter;
+el('g-login').onkeydown = e => { if (e.key === 'Enter') el('g-pass').focus(); };
 el('g-pass').onkeydown = e => { if (e.key === 'Enter') enter(); };
-el('tab-adm').onclick = () => setTab('adm');
-el('tab-bur').onclick = () => setTab('bur');
 
 el('req-open').onclick = () => { el('req-form').hidden = false; el('req-open').disabled = true; el('r-city').focus(); };
 el('req-cancel').onclick = () => { el('req-form').hidden = true; el('req-open').disabled = false; el('req-msg').textContent = ''; };
@@ -411,7 +392,7 @@ el('req-send').onclick = () => {
   el('req-form').innerHTML = '<p style="margin:0;font-size:14px"><b>Заявка отправлена.</b> Куратор бюро свяжется в течение рабочего дня. ' +
     'Если нужно быстрее — <a href="mailto:nana@pbsreda.ru">nana@pbsreda.ru</a>.</p>';
 };
-el('g-pass').focus();
+el('g-login').focus();
 </script>
 </body>
 </html>
