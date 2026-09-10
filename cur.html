@@ -83,6 +83,7 @@ body.locked{overflow:hidden}
 .gate .foot-note{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3);line-height:1.5}
 
 /* ---------- шапка ---------- */
+
 .top{border-bottom:1px solid var(--line)}
 .top-in{max-width:1180px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
 .logo{height:34px;display:block}
@@ -369,7 +370,7 @@ body.locked{overflow:hidden}
       <span>Всероссийский конкурс лучших проектов создания комфортной городской среды</span>
     </div>
     <div class="top-right">
-      <span class="role" id="role-tag">Администрация</span>
+      <span class="role" id="role-tag">Куратор бюро</span>
       <div class="city-pick" id="city-pick">
         <label for="city">Территория</label>
         <select id="city"></select>
@@ -1053,7 +1054,7 @@ function fillCities(){
 el('city').onchange = () => {
   if (ROLE === 'adm'){ el('city').value = KEY; toast('Администрация видит только свою территорию'); return; }
   KEY = el('city').value; items = STATE[KEY];
-  location.hash = KEY;
+  try { localStorage.setItem('pbsreda-last-v1', KEY); } catch (e) {}
   applyRole();
 };
 
@@ -1075,9 +1076,10 @@ function applyRole(){
   if (ROLE === 'adm' && !info().active){
     el('chips').innerHTML = ''; el('tpl-box').innerHTML = ''; el('set-box').innerHTML = ''; el('tally').innerHTML = '';
     el('info').innerHTML = ''; el('rail-links').innerHTML = ''; el('empty').hidden = true;
+    if (el('plan')) el('plan').innerHTML = '';
     el('rail-note').innerHTML = '<b>Территория закрыта</b>Страница откроется, когда бюро возьмёт территорию в работу.';
     el('list').innerHTML = '<div class="empty"><b>Профайл территории ещё не открыт.</b><br>' +
-      'Куратор бюро откроет страницу, когда территория войдёт в работу, и пришлёт пароль.</div>';
+      'Куратор бюро откроет страницу, когда территория войдёт в работу, и пришлёт логин с паролем.</div>';
     el('f-count').textContent = ''; el('f-hint').textContent = ''; el('f-bar').style.width = '0';
     return;
   }
@@ -1085,12 +1087,9 @@ function applyRole(){
 }
 
 if (ROLE !== 'adm'){
-  const hs = decodeURIComponent(location.hash.slice(1));
-  if (KEYS.includes(hs)) KEY = hs;
-  window.addEventListener('hashchange', () => {
-    const k = decodeURIComponent(location.hash.slice(1));
-    if (KEYS.includes(k) && k !== KEY && el('gate').hidden){ KEY = k; applyRole(); }
-  });
+  let last = '';
+  try { last = localStorage.getItem('pbsreda-last-v1') || ''; } catch (e) {}
+  if (KEYS.includes(last) && CITY[last].active) KEY = last;
 }
 applyRole();
 
