@@ -519,15 +519,27 @@ try {
 const BKEY = 'pbsreda-board-v1';
 let WORK = {};
 function loadBoard(){
-  try { WORK = JSON.parse(localStorage.getItem(BKEY) || '{}') || {}; } catch (e) { WORK = {}; }
-  if (typeof WORK !== 'object') WORK = {};
-  for (const c in WORK) for (const t in WORK[c]){
-    const x = WORK[c][t];
-    if (!x.st) x.st = x.ret ? 'ret' : x.done ? 'done' : 'work';
-    if (!x.files) x.files = x.file ? [x.file] : [];
-    if (x.com === undefined) x.com = '';
-    delete x.ret; delete x.done; delete x.file;
-  }
+  WORK = {};
+  try {
+    const raw = JSON.parse(localStorage.getItem(BKEY) || '{}');
+    if (raw && typeof raw === 'object') for (const c in raw){
+      const src = raw[c];
+      if (!src || typeof src !== 'object') continue;
+      WORK[c] = {};
+      for (const t in src){
+        const x = src[t];
+        if (!x || typeof x !== 'object') continue;
+        WORK[c][t] = {
+          st: x.st || (x.ret ? 'ret' : x.done ? 'done' : 'work'),
+          files: Array.isArray(x.files) ? x.files : (x.file ? [x.file] : []),
+          img: typeof x.img === 'string' ? x.img : '',
+          note: typeof x.note === 'string' ? x.note : '',
+          com: typeof x.com === 'string' ? x.com : '',
+          hidden: !!x.hidden
+        };
+      }
+    }
+  } catch (e) { WORK = {}; }
 }
 function saveBoard(){
   try { localStorage.setItem(BKEY, JSON.stringify(WORK)); }
@@ -540,7 +552,10 @@ function saveBoard(){
 loadBoard();
 
 let EXTRA = {};
-function loadExtra(){ try { EXTRA = JSON.parse(localStorage.getItem('pbsreda-extra-v1') || '{}'); } catch (e) { EXTRA = {}; } }
+function loadExtra(){
+  try { EXTRA = JSON.parse(localStorage.getItem('pbsreda-extra-v1') || '{}') || {}; } catch (e) { EXTRA = {}; }
+  if (!EXTRA || typeof EXTRA !== 'object') EXTRA = {};
+}
 function saveExtra(){ try { localStorage.setItem('pbsreda-extra-v1', JSON.stringify(EXTRA)); } catch (e) {} }
 loadExtra();
 const extraOf = si => (Array.isArray(EXTRA[KEY]) ? EXTRA[KEY] : []).filter(x => x.si === si);
@@ -607,6 +622,13 @@ const cellOf = id => (WORK[KEY] && WORK[KEY][id]) || blank();
 const isSpec = () => ROLE === 'spec';
 
 function render(){
+  try { drawBoard(); }
+  catch (e){
+    el('board').innerHTML = '<div class="empty"><b>Доска не отрисовалась.</b><br>' + esc(e.message) +
+      '<br><br><button class="btn" id="reset-board">Сбросить данные доски</button></div>';
+  }
+}
+function drawBoard(){
   let all = 0, done = 0, withFile = 0, ret = 0, fix = 0, html = '';
   BOARD.forEach(s => {
     let d = 0;
@@ -749,6 +771,10 @@ function toast(t){ const x = el('toast'); x.textContent = t; x.classList.add('on
 document.addEventListener('click', e => {
   if (e.target.id === 'm-img') return showLight(0);
   if (e.target.id === 'l-close' || e.target.id === 'light' || e.target.id === 'l-img'){ hideLight(); return; }
+  if (e.target.id === 'reset-board'){
+    try { localStorage.removeItem(BKEY); localStorage.removeItem('pbsreda-extra-v1'); } catch (err) {}
+    WORK = {}; EXTRA = {}; render(); toast('Данные доски сброшены'); return;
+  }
   const tile = e.target.closest('[data-t]');
   if (tile) return openTile(tile.dataset.t);
 
