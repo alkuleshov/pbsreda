@@ -109,6 +109,28 @@ body.locked{overflow:hidden}
 .info .ir{display:flex;gap:12px;font-size:13.5px;padding:5px 0}
 .info .ir b{font-weight:600;white-space:nowrap}
 .info .ir span{color:var(--ink-2);margin-left:auto;text-align:right}
+.info{border:2px solid var(--green);background:var(--green-pale)}
+.info .ir b{color:var(--ink)}
+.info .ir span.big{font-size:16px;font-weight:700;color:var(--green-dark)}
+.info .vote{border-top:1px solid rgba(17,161,56,.25)}
+.info .vote-n b{color:var(--green-dark)}
+.info .vbar{background:rgba(17,161,56,.2)}
+.planline{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.pit{border:1px solid var(--line);border-radius:var(--r);padding:7px 11px;font-size:12.5px;line-height:1.3;min-width:150px}
+.pit b{display:block;font-size:13px;font-weight:700}
+.pit span{display:block;color:var(--ink-2)}
+.pit u{text-decoration:none;font-size:11.5px;color:var(--ink-3)}
+.pit.soon{border-color:#E08A0C;background:#FDF4E3}
+.pit.soon u{color:#9A6208;font-weight:600}
+.pit.today{border:2px solid #B4342A;background:var(--red-pale)}
+.pit.today u{color:var(--red);font-weight:700}
+.pit.past{opacity:.55}
+.planed{margin-top:12px;border-top:1px solid var(--line-2);padding-top:10px}
+.planed .flab{font-size:12px;color:var(--ink-2);margin:0 0 8px}
+.prow{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.prow input[type=date]{width:150px;border:1px solid var(--line);border-radius:var(--r);padding:6px 9px;font-size:13px}
+.prow input:not([type=date]){flex:1;min-width:180px;border:1px solid var(--line);border-radius:var(--r);padding:6px 9px;font-size:13px}
+.prow .btn{padding:6px 12px;font-size:13px}
 .info .vote{margin-top:8px;padding-top:10px;border-top:1px solid var(--line-2)}
 .info .vote-n{display:flex;align-items:baseline;gap:8px}
 .info .vote-n b{font-size:23px;font-weight:700;line-height:1.1}
@@ -313,8 +335,8 @@ body.locked{overflow:hidden}
         </div>
         <p class="sub" id="g-sub">Раздел для администраций городов, с которыми бюро готовит заявку.</p>
         <div class="f" id="g-city-f">
-          <label for="g-city">Территория</label>
-          <select id="g-city"></select>
+          <label for="g-login">Логин территории</label>
+          <input id="g-login" autocomplete="username" placeholder="например, city1">
         </div>
         <div class="f" id="b-role-f" hidden>
           <label for="b-role">Кабинет</label>
@@ -365,6 +387,7 @@ body.locked{overflow:hidden}
       </div>
       <div class="info" id="info"></div>
     </div>
+    <div id="plan"></div>
     <div class="tally" id="tally" aria-label="Опись запросов"></div>
     <div class="tally-legend">
       <span><i class="dot"></i>не загружено</span>
@@ -413,7 +436,7 @@ body.locked{overflow:hidden}
 <script>
 const DATA = [{"title":"Сопроводительные документы — строго по перечню заявки","items":[{"code":"ПРОТОКОЛ1","t":"Протокол № 1 общественной комиссии о выборе территории","need":"Скан с подписями и приложениями, PDF","nm":"Решение о выборе территории","n":"1.3","forr":""},{"code":"ПРОТОКОЛ2","t":"Протокол № 2 подведения итогов приёма предложений по мероприятиям","need":"Скан с подписями, PDF","nm":"Решение о перечне мероприятий","n":"1.4","forr":""},{"code":"ГЕНПЛАН","t":"Генеральный план муниципального образования, актуальная редакция","need":"DWG + PDF","nm":"Схема в контексте города","n":"1.5.1","forr":"4.3"},{"code":"РАЗВИТИЕ","t":"Мероприятия по развитию за 2022–2028: дороги, фасады, реконструкция, новое строительство","need":"Текст с адресами, стоимостью и годом реализации","nm":"Программы и инвестпроекты","n":"1.5.4","forr":"3.3"},{"code":"НАСЕЛЕНИЕ","t":"Справка о численности населения на отчётную дату","need":"Справка на бланке, скан","nm":"Численность населения","n":"1.9","forr":"5.7"},{"code":"ЕГРН","t":"Выписки ЕГРН, схема границ, сведения о правообладателях","need":"PDF","nm":"Отсутствие претензий на участок","n":"1.10","forr":""},{"code":"ОХРАНЗОНЫ","t":"Границы зон охраны объектов культурного наследия и исторического поселения","need":"Карта с нанесением зон и пояснением","nm":"Справка по культурному наследию","n":"1.11","forr":"4.3"},{"code":"ТОПО","t":"Топографическая съёмка территории, не старше 3 лет","need":"DWG (М 1:500) + PDF","nm":"Актуальная топосъёмка","n":"1.13","forr":"4.4"}]},{"title":"Территория, границы и градостроительные документы","items":[{"code":"ПЗЗ","t":"Правила землепользования и застройки","need":"PDF + карта градостроительного зонирования","nm":"Существующее положение","n":"1","forr":"4.3, 4.4"},{"code":"ООПТ","t":"Охраняемые природные зоны в 10 минутах пешком, с указанием проблем","need":"Карта с нанесением зон и пояснением","nm":"Существующее положение","n":"2","forr":"4.3"},{"code":"ЗАСТРОЙКА","t":"Многоэтажная застройка: жилые и общественные объекты выше 2 этажей","need":"Карта с адресами и числом квартир","nm":"Существующее положение","n":"3","forr":"4.3, 5.3"},{"code":"ПРОСТРАНСТВА","t":"Общественные пространства: парки, скверы, площади, зелёные зоны, аллеи, подходы к воде","need":"Объекты, нанесённые на Яндекс-карту","nm":"Обоснование выбора места","n":"4","forr":"3.1, 4.2"},{"code":"КУЛЬТОБЪЕКТЫ","t":"Объекты культурного значения: храмы, памятники, воинские захоронения, знаковые и событийные места","need":"Текст с фото, наименованиями и адресами","nm":"Обоснование выбора места","n":"5","forr":"1.11, 4.2"},{"code":"МАСТЕРПЛАН","t":"Мастер-план территории (при наличии)","need":"PDF","nm":"Задачи развития муниципального образования","n":"6","forr":"3.1"},{"code":"ИСТОРИЯ","t":"Историческая справка по основным вехам развития, в том числе об утраченных объектах","need":"Текст с фотографиями, контакты музеев и архивов","nm":"Обоснование выбора места","n":"7","forr":"1.6, 4.2"}]},{"title":"Инженерная и транспортная инфраструктура","items":[{"code":"ВОДА","t":"Схема водоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"1","forr":"1.5.5, 4.3"},{"code":"ГАЗ","t":"Схема газоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"2","forr":"1.5.5, 4.3"},{"code":"КАНАЛИЗАЦИЯ","t":"Схема канализации и водоотведения","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"3","forr":"1.5.5, 4.3"},{"code":"ТЕПЛО","t":"Схема теплоснабжения участка","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"4","forr":"1.5.5, 4.3"},{"code":"ЭЛЕКТРО","t":"Схема электроснабжения и наружного освещения","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"5","forr":"1.5.5, 4.3"},{"code":"СВЯЗЬ","t":"Схема сетей связи","need":"DWG + PDF от балансодержателя","nm":"Существующее положение","n":"6","forr":"1.5.5, 4.3"},{"code":"ТРАНСПОРТ","t":"Транспортная инфраструктура: маршруты, остановки, вело- и турмаршруты, парковки","need":"Яндекс-карта с маршрутами и номерами","nm":"Существующее положение","n":"7","forr":"4.3, 4.4"}]},{"title":"Население и социальная сфера","items":[{"code":"ДЕМОГРАФИЯ","t":"Демографические показатели: отчёты территориального органа статистики","need":"PDF / XLSX","nm":"Демографические характеристики","n":"1","forr":"5.7"},{"code":"СТАТСБОРНИК","t":"Статистические сборники и доклады с обобщёнными данными за год","need":"PDF","nm":"Демографические характеристики","n":"2","forr":"5.7"},{"code":"СОЦСФЕРА","t":"Объекты социальной сферы: ДК, ЗАГС, МФЦ, почта, школы, детсады, медицина, полиция","need":"Текст с наименованиями и адресами","nm":"Обоснование выбора места","n":"3","forr":"3.2, 4.2"},{"code":"ДК-ПОЛЬЗОВАТЕЛИ","t":"Кто сейчас активно пользуется ДК у территории: кружки, секции, праздники","need":"Перечень с численностью и расписанием","nm":"Социокультурное исследование","n":"4","forr":"2.1, 2.3"}]},{"title":"Экономика, имущество и расходы","items":[{"code":"БИЗНЕС","t":"Малый и средний бизнес в 10 минутах пешком (~500 м): магазины, рынки, кафе, услуги","need":"Текст с наименованиями и адресами","nm":"Обоснование выбора места","n":"1","forr":"4.2, 5.4, 5.6"},{"code":"АРЕНДА","t":"Стоимость кв. м при сдаче в аренду коммерческой и государственной недвижимости","need":"Цифра + источник данных","nm":"Прогноз роста капитализации","n":"2","forr":"5.3, 5.5"},{"code":"ДЕЙСТВ-ГОС","t":"Действующие объекты государственной собственности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации","n":"3","forr":"5.3, 5.5"},{"code":"ЗАБРОШ-БИЗНЕС","t":"Заброшенные объекты предпринимательской деятельности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации","n":"4","forr":"5.3, 5.4"},{"code":"ЗАБРОШ-ГОС","t":"Заброшенные объекты государственной собственности в границах доступности, кв. м","need":"Цифра + перечень адресов","nm":"Прогноз роста капитализации","n":"5","forr":"5.3"},{"code":"ИНВЕСТСТРАТЕГИЯ","t":"Инвестиционная стратегия муниципального образования","need":"PDF","nm":"Потенциал развития предприятий","n":"6","forr":"3.1, 5.6"},{"code":"ПРОГНОЗ","t":"Прогноз социально-экономического развития муниципального образования","need":"PDF","nm":"Иные экономические и социальные эффекты","n":"7","forr":"3.1, 5.8"},{"code":"АНАЛОГ","t":"Объект-аналог: штатная численность, площадь территории, фактические расходы за год","need":"Заполненный шаблон XLSX","nm":"Эксплуатационные расходы","n":"8","forr":"5.2, 5.9"},{"code":"РАСХОДЫ","t":"Укрупнённый расчёт ежегодных эксплуатационных расходов по форме 5.2","need":"Заполненный шаблон XLSX","nm":"Эксплуатационные расходы","n":"9","forr":"5.2, 5.9"}]},{"title":"Программы, стратегии и решения администрации","items":[{"code":"СТРАТЕГИЯ","t":"Стратегия социально-экономического развития муниципального образования","need":"PDF, с датой утверждения","nm":"Задачи развития муниципального образования","n":"1","forr":"3.1"},{"code":"ОТЧЁТЫ","t":"Отчёты о реализации муниципальных программ за 3 года","need":"PDF","nm":"Задачи развития муниципального образования","n":"2","forr":"3.1"},{"code":"ПОСТАНОВЛЕНИЯ","t":"Постановления и решения администрации и Собрания депутатов за 3 года по развитию территории","need":"PDF","nm":"Задачи развития муниципального образования","n":"3","forr":"3.1"},{"code":"МУНПРОГРАММЫ","t":"Действующие муниципальные программы с целями, задачами и этапами","need":"PDF","nm":"Механизмы синхронизации","n":"4","forr":"1.5.4, 3.3"},{"code":"ПСД","t":"Проектно-сметная документация и планы по инфраструктурным проектам (при наличии)","need":"PDF","nm":"Механизмы синхронизации","n":"5","forr":"1.5.4, 3.3"}]},{"title":"Общественное участие и медиа","items":[{"code":"ОПРОС","t":"Распространение ссылки на онлайн-опрос по чатам, группам, коллективам","need":"Скрины рассылки, перечень чатов","nm":"Социокультурное исследование","n":"1","forr":"2.1, 2.2"},{"code":"ФОКУСГРУППА","t":"Список участников фокус-группы с должностями и контактами","need":"Таблица ФИО, должность, телефон","nm":"Социокультурное исследование","n":"2","forr":"2.1, 2.2"},{"code":"КОМАНДА","t":"Состав «команды перемен»: директора школ, ДК, предприниматели, активисты","need":"Список ФИО, должность, телефон, XLSX","nm":"Соучаствующее проектирование","n":"3","forr":"2.2"},{"code":"КОНКУРСЫ","t":"Тематика и сроки конкурса творческих работ (лого, детская площадка, входная группа, сочинение)","need":"Согласованный перечень номинаций и сроков","nm":"Соучаствующее проектирование","n":"4","forr":"2.2, 2.4"},{"code":"СЕМИНАР-ПЛОЩАДКА","t":"Помещение и оборудование для проектного семинара на ~40 человек (не в администрации)","need":"Адрес, фото зала, подтверждение брони","nm":"Соучаствующее проектирование","n":"5","forr":"2.2"},{"code":"СМИ","t":"Публикация протоколов в СМИ и на сайте администрации","need":"Ссылки + скриншоты с видимой датой","nm":"Соучаствующее проектирование","n":"6","forr":"2.2, 2.4"},{"code":"ФОРМЫ-СКРИНЫ","t":"Скрины (фото) всех форм сбора предложений в электронном виде","need":"Папка со скринами","nm":"Соучаствующее проектирование","n":"7","forr":"2.2, 2.4"},{"code":"СУББОТНИК","t":"Субботник / день древонасаждения на территории","need":"Дата проведения, фотоотчёт, список участников","nm":"Программа развития территории","n":"8","forr":"2.3, 2.4"}]}];
 const PAGE = {role:'adm', key:'city1'};
-const KEYS = ['city1','city2','city3','city4','city5','city6','city7','city8','city9','city10'];
+const KEYS = ['city1','city2','city3','city4','city5','city6','city7','city8','city9','city10','city11','city12','city13','city14','city15','city16','city17','city18','city19','city20'];
 const ROOT = 'Общий диск «Среда» / Конкурс 2027 / ';
 const PASS = {crd:'1234', mgr:'1234', spec:'1234'};
 
@@ -427,7 +450,8 @@ const word = n => (n % 10 === 1 && n % 100 !== 11) ? 'документ'
 /* ---------- территории ---------- */
 const CITY = {};
 KEYS.forEach((k, i) => CITY[k] = {
-  name: 'Город ' + (i + 1), pass: '1234', landing: '', budget: '', active: i < 4, closedAt: 0,
+  name: 'Город ' + (i + 1), login: 'city' + (i + 1), pass: '1234', landing: '', budget: '', address: '',
+  plan: [], active: i < 4, closedAt: 0,
   votes: 0, target: 0
 });
 
@@ -481,6 +505,7 @@ const tplFor = code => TPL.filter(t => t.code === code);
 let tplOpen = false, setOpen = false;
 
 function renderTpl(){
+  if (ROLE === 'adm'){ el('tpl-box').innerHTML = ''; return; }
   const ready = TPL.filter(t => t.f).length;
   el('tpl-box').innerHTML =
     '<div class="tpl' + (tplOpen ? ' open' : '') + '"><button class="tpl-h" id="tpl-toggle" aria-expanded="' + tplOpen + '">' +
@@ -504,13 +529,15 @@ function renderSettings(){
       const c = DRAFT[k];
       return '<div class="cityset"><h4>' + esc(c.name) + ' · pbsreda.ru/' + k + '</h4><div class="g">' +
         fld(k, 'name', 'Название территории', c.name) +
+        fld(k, 'login', 'Логин для администрации', c.login || '') +
         fld(k, 'pass', 'Пароль для администрации', c.pass) +
+        fld(k, 'address', 'Адрес территории проекта', c.address || '', 'улица, ориентир, город') +
         fld(k, 'budget', 'Бюджет проекта', c.budget, 'например 210 млн ₽') +
         fld(k, 'landing', 'Ссылка на страницу проекта', c.landing, 'https://') +
         '<div class="f"><label>Голосование: проголосовало / цель</label><div style="display:flex;gap:8px">' +
           '<input data-set="' + k + '|votes" value="' + esc(String(c.votes)) + '" inputmode="numeric">' +
           '<input data-set="' + k + '|target" value="' + esc(String(c.target)) + '" inputmode="numeric"></div></div>' +
-        '</div><div class="acts">' +
+        '</div>' + planEditor(k) + '<div class="acts">' +
         '<button class="btn btn-main" id="save-' + k + '" data-save="' + k + '"' + (cityDirty(k) ? '' : ' disabled') + '>Сохранить</button>' +
         '<button class="btn" data-gen="' + k + '">Случайный пароль</button>' +
         '<button class="btn" data-copy="' + k + '">Скопировать доступ</button>' +
@@ -535,6 +562,15 @@ function renderSettings(){
     '</div>' +
     '<p class="hint" style="margin:12px 0 0">Пароль кабинетов бюро: куратор, менеджер и специалист входят по своим паролям — их меняем на этапе подключения базы.</p>' +
     '</div></div>';
+}
+function planEditor(k){
+  const list = DRAFT[k].plan || [];
+  return '<div class="planed"><p class="flab">Сроки мероприятий — территория увидит их у себя и получит оповещение в день срока</p>' +
+    list.map((p, i) =>
+      '<div class="prow"><input type="date" data-plan="' + k + '|' + i + '|d" value="' + esc(p.d || '') + '">' +
+      '<input data-plan="' + k + '|' + i + '|t" value="' + esc(p.t || '') + '" placeholder="Что должно случиться">' +
+      '<button class="btn btn-no" data-planrm="' + k + '|' + i + '">Убрать</button></div>').join('') +
+    '<button class="btn" data-planadd="' + k + '">Добавить срок</button></div>';
 }
 function fld(k, key, label, val, ph){
   return '<div class="f"><label>' + label + '</label><input data-set="' + k + '|' + key + '" value="' + esc(val) +
@@ -638,15 +674,49 @@ function purgeCity(k){
 function renderInfo(){
   const c = info();
   const pct = c.target > 0 ? Math.min(100, Math.round(c.votes / c.target * 100)) : 0;
+  const money = c.budget ? (/[a-zA-Zа-яА-Я₽]/.test(c.budget) ? esc(c.budget) : esc(c.budget) + ' рублей') : 'уточняется';
   el('info').innerHTML =
-    '<div class="ir"><b>Бюджет проекта</b><span>' + (c.budget ? esc(c.budget) : 'уточняется') + '</span></div>' +
+    '<div class="ir"><b>Бюджет проекта</b><span class="big">' + money + '</span></div>' +
+    (c.address ? '<div class="ir"><b>Территория проекта</b><span>' + esc(c.address) +
+      ' · <a href="https://yandex.ru/maps/?text=' + encodeURIComponent(c.address) + '" target="_blank" rel="noopener">на карте</a></span></div>' : '') +
     '<div class="ir"><b>Страница проекта</b><span>' +
       (c.landing ? '<a href="' + esc(c.landing) + '" target="_blank" rel="noopener">открыть</a>' : 'ссылку добавит куратор') +
     '</span></div>' +
     '<div class="vote"><div class="vote-n"><b>' + c.votes.toLocaleString('ru-RU') + '</b>' +
       '<span>проголосовало из ' + (c.target ? c.target.toLocaleString('ru-RU') + ' нужных' : 'цели, которую поставит куратор') + '</span></div>' +
       '<div class="vbar"><i style="width:' + pct + '%"></i></div></div>';
+  renderPlan();
 }
+
+/* ---------- сроки мероприятий ---------- */
+const DAYMS = 24 * 3600 * 1000;
+const planLeft = d => Math.round((new Date(d + 'T00:00:00').getTime() - new Date().setHours(0,0,0,0)) / DAYMS);
+function renderPlan(){
+  const box = el('plan'); if (!box) return;
+  const list = (info().plan || []).filter(p => p.d).slice().sort((a, b) => a.d.localeCompare(b.d));
+  if (!list.length){ box.innerHTML = ''; return; }
+  box.innerHTML = '<div class="planline">' + list.map(p => {
+    const n = planLeft(p.d);
+    const cls = n < 0 ? 'past' : n === 0 ? 'today' : n <= 3 ? 'soon' : '';
+    const when = n < 0 ? 'прошёл' : n === 0 ? 'сегодня' : 'через ' + n + ' дн.';
+    return '<div class="pit ' + cls + '"><b>' + esc(p.d.split('-').reverse().join('.')) + '</b>' +
+      '<span>' + esc(p.t) + '</span><u>' + when + '</u></div>';
+  }).join('') + '</div>';
+  if (ROLE === 'adm') notifyPlan(list);
+}
+let notified = false;
+function notifyPlan(list){
+  if (notified || typeof Notification === 'undefined') return;
+  const due = list.filter(p => planLeft(p.d) === 0);
+  if (!due.length) return;
+  notified = true;
+  const show = () => due.forEach(p => {
+    try { new Notification('Срок сегодня: ' + p.t, {body: info().name + ' · ' + p.d.split('-').reverse().join('.')}); } catch (e) {}
+  });
+  if (Notification.permission === 'granted') show();
+  else if (Notification.permission !== 'denied') Notification.requestPermission().then(r => { if (r === 'granted') show(); });
+}
+
 
 /* ---------- фильтры ---------- */
 function counts(){
@@ -702,6 +772,7 @@ function render(){
   renderTpl(); renderSettings(); renderInfo();
   el('list').innerHTML = html;
   el('empty').hidden = shown > 0;
+  saveDocs();
   stats();
 }
 
@@ -774,6 +845,20 @@ function row(it){
     '</div></div>';
 }
 
+/* одобренные документы становятся исходными данными на доске специалистов */
+function saveDocs(){
+  try {
+    const all = JSON.parse(localStorage.getItem('pbsreda-docs-v1') || '{}');
+    all[KEY] = items.filter(i => i.status === 'ok').map(i => ({
+      code: i.code, t: i.t,
+      secs: String(i.forr || '').split(',').map(s => s.trim()).filter(Boolean)
+        .concat(/^[0-9]+[.]/.test(i.n || '') ? [i.n] : []),
+      files: i.files.map(f => f.name)
+    }));
+    localStorage.setItem('pbsreda-docs-v1', JSON.stringify(all));
+  } catch (e) {}
+}
+
 /* ---------- сводка ---------- */
 function stats(){
   const c = counts();
@@ -823,7 +908,7 @@ function addFiles(i, list){
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-sec],#tpl-toggle,#set-toggle,[data-gen],[data-copy],[data-tget],[data-tput],' +
     '[data-open],[data-del],[data-go],[data-drive],[data-drop],[data-ok],[data-unok],[data-back],[data-done],[data-save],' +
-    '[data-add],[data-reopen],[data-purge],#d-cancel,#d-create,#d-del,#d-purge,.chip');
+    '[data-add],[data-reopen],[data-purge],[data-planadd],[data-planrm],#d-cancel,#d-create,#d-del,#d-purge,.chip');
   if (!t) return;
   const d = t.dataset;
 
@@ -870,6 +955,16 @@ document.addEventListener('click', e => {
     chips(); render(); reopen(i); toast('Возвращено на доработку'); return;
   }
   if (d.done !== undefined){ const i = +d.done; items[i].done = !items[i].done; chips(); render(); reopen(i); return; }
+  if (d.planadd !== undefined){
+    const k = d.planadd;
+    DRAFT[k].plan = (DRAFT[k].plan || []).concat([{d:'', t:''}]);
+    renderSettings(); const b = el('save-' + k); if (b) b.disabled = false; return;
+  }
+  if (d.planrm !== undefined){
+    const [k, i] = d.planrm.split('|');
+    DRAFT[k].plan.splice(+i, 1);
+    renderSettings(); const b = el('save-' + k); if (b) b.disabled = false; return;
+  }
   if (d.add !== undefined) return dlgAdd();
   if (d.drop !== undefined) return dlgDrop(d.drop);
   if (t.id === 'd-cancel') return dlgClose();
@@ -922,6 +1017,11 @@ document.addEventListener('input', e => {
   else if (d.note !== undefined) items[+d.note].note = e.target.value;
   else if (d.backtext !== undefined) items[+d.backtext].back = e.target.value;
   else if (d.dl !== undefined) items[+d.dl].deadline = e.target.value;
+  else if (d.plan !== undefined){
+    const [k, i, f] = d.plan.split('|');
+    DRAFT[k].plan[+i][f] = e.target.value;
+    const b = el('save-' + k); if (b) b.disabled = false;
+  }
   else if (d.set !== undefined){
     const [k, key] = d.set.split('|');
     DRAFT[k][key] = (key === 'votes' || key === 'target') ? (parseInt(e.target.value.replace(/\D/g,''), 10) || 0) : e.target.value;
@@ -947,9 +1047,8 @@ document.addEventListener('keydown', e => {
 
 /* ---------- территории в списках ---------- */
 function fillCities(){
-  const opts = KEYS.map(k => '<option value="' + k + '">' + esc(CITY[k].name) + '</option>').join('');
+  const opts = KEYS.filter(k => CITY[k].active).map(k => '<option value="' + k + '">' + esc(CITY[k].name) + '</option>').join('');
   el('city').innerHTML = opts; el('city').value = KEY;
-  el('g-city').innerHTML = opts; el('g-city').value = KEY;
 }
 el('city').onchange = () => {
   if (ROLE === 'adm'){ el('city').value = KEY; toast('Администрация видит только свою территорию'); return; }
@@ -1036,8 +1135,9 @@ function enter(){
   const p = el('g-pass').value.trim();
   if (!p){ el('g-err').textContent = 'Введите пароль'; el('g-pass').focus(); return; }
   if (TAB === 'adm'){
-    const k = el('g-city').value;
-    if (p !== CITY[k].pass){ el('g-err').textContent = 'Пароль не подходит'; el('g-pass').select(); return; }
+    const lg = (el('g-login').value || '').trim().toLowerCase();
+    const k = KEYS.find(x => CITY[x].active && (CITY[x].login || '').toLowerCase() === lg);
+    if (!k || p !== CITY[k].pass){ el('g-err').textContent = 'Логин или пароль не подходят'; el('g-pass').select(); return; }
     setAuth({role:'adm', key:k});
     if (k === KEY && ROLE === 'adm'){ hideGate(); return; }
     go(k); return;
@@ -1071,6 +1171,7 @@ el('logout').onclick = () => {
 function showGate(){
   el('g-pass').value = ''; el('g-err').textContent = '';
   fillCities();
+  el('g-login').value = ROLE === 'adm' ? (info().login || '') : '';
   el('b-role').value = ROLE === 'adm' ? 'crd' : ROLE;
   setTab(ROLE === 'adm' ? 'adm' : 'bur');
   el('g-sub').textContent = ROLE === 'adm'

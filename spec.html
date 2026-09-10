@@ -109,6 +109,28 @@ body.locked{overflow:hidden}
 .info .ir{display:flex;gap:12px;font-size:13.5px;padding:5px 0}
 .info .ir b{font-weight:600;white-space:nowrap}
 .info .ir span{color:var(--ink-2);margin-left:auto;text-align:right}
+.info{border:2px solid var(--green);background:var(--green-pale)}
+.info .ir b{color:var(--ink)}
+.info .ir span.big{font-size:16px;font-weight:700;color:var(--green-dark)}
+.info .vote{border-top:1px solid rgba(17,161,56,.25)}
+.info .vote-n b{color:var(--green-dark)}
+.info .vbar{background:rgba(17,161,56,.2)}
+.planline{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+.pit{border:1px solid var(--line);border-radius:var(--r);padding:7px 11px;font-size:12.5px;line-height:1.3;min-width:150px}
+.pit b{display:block;font-size:13px;font-weight:700}
+.pit span{display:block;color:var(--ink-2)}
+.pit u{text-decoration:none;font-size:11.5px;color:var(--ink-3)}
+.pit.soon{border-color:#E08A0C;background:#FDF4E3}
+.pit.soon u{color:#9A6208;font-weight:600}
+.pit.today{border:2px solid #B4342A;background:var(--red-pale)}
+.pit.today u{color:var(--red);font-weight:700}
+.pit.past{opacity:.55}
+.planed{margin-top:12px;border-top:1px solid var(--line-2);padding-top:10px}
+.planed .flab{font-size:12px;color:var(--ink-2);margin:0 0 8px}
+.prow{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.prow input[type=date]{width:150px;border:1px solid var(--line);border-radius:var(--r);padding:6px 9px;font-size:13px}
+.prow input:not([type=date]){flex:1;min-width:180px;border:1px solid var(--line);border-radius:var(--r);padding:6px 9px;font-size:13px}
+.prow .btn{padding:6px 12px;font-size:13px}
 .info .vote{margin-top:8px;padding-top:10px;border-top:1px solid var(--line-2)}
 .info .vote-n{display:flex;align-items:baseline;gap:8px}
 .info .vote-n b{font-size:23px;font-weight:700;line-height:1.1}
@@ -327,6 +349,17 @@ body.locked{overflow:hidden}
 .tile.fix{border:2px solid #1F6FD0;background:#E4EEFA}
 .tile.fix .strip{background:#1F6FD0}
 .tile.done .nm,.tile.ret .nm,.tile.fix .nm{font-weight:500;color:var(--ink)}
+.tile.off{opacity:.45;border-style:dashed}
+.tile .src{position:absolute;right:6px;top:5px;z-index:4;width:15px;height:15px;border-radius:50%;
+  background:var(--ink);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.srcbox{border:1px solid var(--line);border-left:3px solid var(--ink);border-radius:var(--r);padding:10px 12px;margin-bottom:14px;font-size:13px}
+.srcbox b{font-weight:600}
+.srcbox ul{margin:6px 0 0;padding-left:18px;line-height:1.5}
+.flist{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:6px}
+.flist li{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:var(--r);padding:7px 10px;font-size:13px}
+.flist li span.n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flist li .fa{margin-left:auto;display:flex;gap:8px;align-items:center}
+.flist li .btn{padding:4px 10px;font-size:12.5px}
 .tile.ret .clip,.tile.fix .clip,.tile.done .clip{color:var(--ink-2)}
 
 .modal{position:fixed;inset:0;background:rgba(23,33,27,.4);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -378,8 +411,8 @@ body.locked{overflow:hidden}
         </div>
         <p class="sub" id="g-sub">Раздел для администраций городов, с которыми бюро готовит заявку.</p>
         <div class="f" id="g-city-f">
-          <label for="g-city">Территория</label>
-          <select id="g-city"></select>
+          <label for="g-login">Логин территории</label>
+          <input id="g-login" autocomplete="username" placeholder="например, city1">
         </div>
         <div class="f" id="b-role-f" hidden>
           <label for="b-role">Кабинет</label>
@@ -430,6 +463,7 @@ body.locked{overflow:hidden}
       <span><b id="b-done">0</b> из <span id="b-all">0</span> листов готово</span>
       <div class="bar"><i id="b-bar"></i></div>
       <span id="b-files">0 с файлами</span>
+      <button class="btn" id="add-tile" hidden>Добавить лист</button>
     </div>
   </div>
   <p class="legend">
@@ -488,18 +522,32 @@ function loadBoard(){
   for (const c in WORK) for (const t in WORK[c]){
     const x = WORK[c][t];
     if (!x.st) x.st = x.ret ? 'ret' : x.done ? 'done' : 'work';
-    delete x.ret; delete x.done;
+    if (!x.files) x.files = x.file ? [x.file] : [];
+    if (x.com === undefined) x.com = '';
+    delete x.ret; delete x.done; delete x.file;
   }
 }
 function saveBoard(){
   try { localStorage.setItem(BKEY, JSON.stringify(WORK)); }
   catch (e) {
     const light = {};
-    for (const c in WORK){ light[c] = {}; for (const t in WORK[c]) light[c][t] = {st:WORK[c][t].st, file:WORK[c][t].file, note:WORK[c][t].note}; }
+    for (const c in WORK){ light[c] = {}; for (const t in WORK[c]) light[c][t] = {st:WORK[c][t].st, files:WORK[c][t].files, note:WORK[c][t].note, com:WORK[c][t].com, hidden:WORK[c][t].hidden}; }
     try { localStorage.setItem(BKEY, JSON.stringify(light)); } catch (e2) {}
   }
 }
 loadBoard();
+
+let EXTRA = {};
+function loadExtra(){ try { EXTRA = JSON.parse(localStorage.getItem('pbsreda-extra-v1') || '{}'); } catch (e) { EXTRA = {}; } }
+function saveExtra(){ try { localStorage.setItem('pbsreda-extra-v1', JSON.stringify(EXTRA)); } catch (e) {} }
+loadExtra();
+const extraOf = si => (EXTRA[KEY] || []).filter(x => x.si === si);
+
+let DOCS = {};
+function loadDocs(){ try { DOCS = JSON.parse(localStorage.getItem('pbsreda-docs-v1') || '{}'); } catch (e) { DOCS = {}; } }
+loadDocs();
+const secMatch = (tn, sec) => tn === sec || tn.indexOf(sec + '.') === 0 || sec.indexOf(tn + '.') === 0;
+const docsFor = t => (DOCS[KEY] || []).filter(d => (d.secs || []).some(s => secMatch(t.n, s)));
 
 let ROLE = PAGE.role, KEY = KEYS[0], OPEN = null;
 const ORIG = {};   // ссылки на оригиналы в этой вкладке
@@ -543,15 +591,15 @@ async function delFile(key){
   try { d.transaction('files', 'readwrite').objectStore('files').delete(key); } catch (e) {}
 }
 /* достаём оригинал: сперва из вкладки, потом из браузерной базы */
-async function ensureOrig(id){
-  const key = KEY + '|' + id;
+async function ensureOrig(id, i){
+  const key = KEY + '|' + id + '|' + i;
   if (ORIG[key]) return ORIG[key];
   const f = await getFile(key);
   if (!f) return null;
-  ORIG[key] = {url: URL.createObjectURL(f), name: f.name || cellOf(id).file};
+  ORIG[key] = {url: URL.createObjectURL(f), name: f.name || (cellOf(id).files[i] || '')};
   return ORIG[key];
 }
-const blank = () => ({st:'work', file:'', img:'', note:''});
+const blank = () => ({st:'work', files:[], img:'', note:'', com:'', hidden:false});
 const cell = id => { WORK[KEY] = WORK[KEY] || {}; return WORK[KEY][id] = WORK[KEY][id] || blank(); };
 const cellOf = id => (WORK[KEY] && WORK[KEY][id]) || blank();
 const isSpec = () => ROLE === 'spec';
@@ -560,15 +608,16 @@ function render(){
   let all = 0, done = 0, withFile = 0, ret = 0, fix = 0, html = '';
   BOARD.forEach(s => {
     let d = 0;
-    const tiles = s.tiles.map(t => {
-      const c = cellOf(t.id);
+    const tiles = s.tiles.concat(extraOf(BOARD.indexOf(s))).filter(t => !cellOf(t.id).hidden || ROLE === 'mgr').map(t => {
+      const c = cellOf(t.id), src = docsFor(t).length;
       all++; if (c.st === 'done'){ done++; d++; } if (c.st === 'ret') ret++; if (c.st === 'fix') fix++;
-      if (c.file) withFile++;
-      return '<button class="tile ' + c.st + '" data-t="' + t.id + '" title="' + esc(t.n + ' · ' + t.t + ' — ' + ST[c.st]) + '">' +
+      if (c.files.length) withFile++;
+      return '<button class="tile ' + c.st + (c.hidden ? ' off' : '') + '" data-t="' + t.id + '" title="' + esc(t.n + ' · ' + t.t + ' — ' + ST[c.st]) + '">' +
         (c.img ? '<span class="thumb" style="background-image:url(' + c.img + ')"></span>' : '') +
         '<span class="num">' + esc(t.n) + '</span>' +
         '<span class="nm">' + esc(t.t) + '</span>' +
-        (c.file ? '<span class="clip">файл</span>' : '') +
+        (c.files.length ? '<span class="clip">' + c.files.length + ' файл' + (c.files.length > 4 ? 'ов' : c.files.length > 1 ? 'а' : '') + '</span>' : '') +
+        (src ? '<span class="src" title="есть исходные данные от администрации">И</span>' : '') +
         (MARK[c.st] ? '<span class="strip">' + MARK[c.st] + '</span>' : '') +
         '</button>';
     }).join('');
@@ -585,68 +634,89 @@ function render(){
 
 function tileById(id){
   for (const s of BOARD) for (const t of s.tiles) if (t.id === id) return t;
+  for (const x of (EXTRA[KEY] || [])) if (x.id === id) return x;
   return null;
 }
 
 function openTile(id){
   OPEN = id;
-  const t = tileById(id), c = cellOf(id), orig = ORIG[KEY + '|' + id];
+  const t = tileById(id), c = cellOf(id);
+  if (!t) return;
   el('m-name').textContent = t.t;
-  el('m-num').textContent = 'Пункт заявки ' + t.n + ' · ' + ST[c.st];
+  el('m-num').textContent = 'Пункт заявки ' + t.n + ' · ' + ST[c.st] + (c.hidden ? ' · лист скрыт' : '');
 
   let body = '';
+  const src = docsFor(t);
+  if (src.length) body += '<div class="srcbox"><b>Исходные данные от администрации</b> — одобрено куратором<ul>' +
+    src.map(d => '<li>' + esc(d.code) + ' — ' + esc(d.t) +
+      (d.files && d.files.length ? ': ' + d.files.map(esc).join(', ') : '') + '</li>').join('') + '</ul></div>';
   if (c.st === 'ret' && c.note) body += '<div class="retbox"><b>Менеджер вернул в работу:</b> ' + esc(c.note) + '</div>';
   if (c.st === 'fix') body += '<div class="fixbox"><b>Специалист внёс изменения.</b> ' +
     (c.note ? 'Замечание было: ' + esc(c.note) : 'Проверьте лист и примите его.') + '</div>';
-  body += '<div class="prev">' + (c.img ? '<img src="' + c.img + '" alt="" id="m-img">'
-    : c.file ? 'Загружен файл: <b>' + esc(c.file) + '</b>' : 'Файл ещё не загружен') + '</div>';
-  if (!isSpec()) body += '<p class="flab">Замечание для специалиста</p>' +
-    '<textarea id="m-note" placeholder="Что нужно поправить">' + esc(c.note) + '</textarea>';
+  if (c.img) body += '<div class="prev"><img src="' + c.img + '" alt="" id="m-img"></div>';
+
+  body += c.files.length
+    ? '<ul class="flist">' + c.files.map((f, i) =>
+        '<li>' + ICON + '<span class="n">' + esc(f) + '</span><span class="fa">' +
+        '<button class="btn" data-fo="' + i + '">Открыть</button>' +
+        '<a class="btn" data-fg="' + i + '" download="' + esc(f) + '" href="#">Скачать</a>' +
+        (isSpec() ? '<button class="btn" data-fd="' + i + '">Убрать</button>' : '') +
+        '</span></li>').join('') + '</ul>'
+    : '<div class="prev">Файлы ещё не загружены</div>';
+
+  if (isSpec()){
+    body += '<p class="flab">Комментарий специалиста — видят менеджер и куратор</p>' +
+      '<textarea id="m-com" placeholder="Что сделано, чего не хватает, какие данные ждём">' + esc(c.com || '') + '</textarea>';
+  } else {
+    if (c.com) body += '<div class="fixbox"><b>Комментарий специалиста:</b> ' + esc(c.com) + '</div>';
+    body += '<p class="flab">Замечание для специалиста</p>' +
+      '<textarea id="m-note" placeholder="Что нужно поправить">' + esc(c.note) + '</textarea>';
+  }
   el('m-body').innerHTML = body;
 
-  const view = c.file
-    ? '<button class="btn" id="m-open">Открыть во весь экран</button>' +
-      '<a class="btn" id="m-get" download="' + esc(c.file) + '" href="' + (orig ? orig.url : c.img || '#') + '">Скачать</a>'
-    : '';
   el('m-acts').innerHTML = isSpec()
-    ? '<button class="btn btn-main" id="m-up">' + (c.file ? 'Заменить файл' : 'Загрузить файл') + '</button>' + view +
+    ? '<button class="btn btn-main" id="m-up">Загрузить файлы</button>' +
       (c.st === 'ret' ? '<button class="btn btn-main" id="m-fix">Изменения внесены</button>' : '') +
       '<button class="btn" id="m-done">' + (c.st === 'done' ? 'Вернуть в работу' : 'Отметить готово') + '</button>' +
-      (c.file ? '<button class="btn" id="m-del">Убрать файл</button>' : '') +
+      '<button class="btn" id="m-com-save">Сохранить комментарий</button>' +
       '<button class="btn close" id="m-close">Закрыть</button>'
-    : view +
-      (c.st === 'fix' ? '<button class="btn btn-main" id="m-accept">Принять лист</button>' : '') +
+    : '<button class="btn btn-main" id="m-accept">Принять лист</button>' +
       '<button class="btn" id="m-ret">' + (c.st === 'ret' ? 'Сохранить замечание' : 'Вернуть в работу') + '</button>' +
       (c.note ? '<button class="btn" id="m-unret">Снять замечание</button>' : '') +
+      '<button class="btn" id="m-hide">' + (c.hidden ? 'Показать лист' : 'Скрыть лист') + '</button>' +
       '<button class="btn close" id="m-close">Закрыть</button>';
   el('modal').hidden = false;
-  if (c.file && !orig) ensureOrig(id).then(o => {
-    if (o && OPEN === id && el('m-get')) el('m-get').href = o.url;
-  });
+
+  c.files.forEach((f, i) => ensureOrig(id, i).then(o => {
+    const a = document.querySelector('[data-fg="' + i + '"]');
+    if (o && a && OPEN === id) a.href = o.url;
+  }));
 }
+const ICON = '<svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true" style="flex:0 0 auto;color:var(--green)"><path d="M4 1.5h5l3.2 3.2v9.8H4V1.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9 1.5v3.4h3.2" stroke="currentColor" stroke-width="1.2"/></svg>';
+
 function closeTile(){ el('modal').hidden = true; OPEN = null; }
 
-async function showLight(){
-  const id = OPEN, c = cellOf(id);
-  if (!c.file) return;
+async function showLight(i){
+  const id = OPEN, c = cellOf(id), f = c.files[i];
+  if (!f) return;
   el('l-msg').hidden = false;
   el('l-msg').textContent = 'Загружаем оригинал…';
   el('l-img').hidden = true;
-  el('l-name').textContent = c.file;
+  el('l-name').textContent = f;
   el('modal').hidden = true;
   el('light').hidden = false;
-  const orig = await ensureOrig(id);
+  const orig = await ensureOrig(id, i);
   if (OPEN !== id) return;
-  const full = orig && /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(c.file) ? orig.url : '';
-  const src = full || c.img;
+  const full = orig && /\.(jpe?g|png|gif|webp|bmp|svg)$/i.test(f) ? orig.url : '';
+  const src = full || (i === 0 ? c.img : '');
   el('l-img').hidden = !src;
-  el('l-img').className = full ? '' : 'up';   // уменьшенную копию растягиваем
+  el('l-img').className = full ? '' : 'up';
   if (src) el('l-img').src = src;
   el('l-msg').hidden = !!src;
   el('l-msg').textContent = src ? '' : 'Это не изображение — файл можно скачать и открыть в своей программе.';
-  el('l-name').textContent = c.file + (full ? '' : ' · оригинал доступен только по кнопке «Скачать»');
+  el('l-name').textContent = f + (full ? '' : ' · оригинал доступен только по кнопке «Скачать»');
   el('l-get').href = orig ? orig.url : (c.img || '#');
-  el('l-get').download = c.file;
+  el('l-get').download = f;
 }
 function hideLight(){
   el('light').hidden = true;
@@ -675,14 +745,26 @@ function shrink(file, cb){
 function toast(t){ const x = el('toast'); x.textContent = t; x.classList.add('on'); clearTimeout(x._t); x._t = setTimeout(() => x.classList.remove('on'), 2800); }
 
 document.addEventListener('click', e => {
-  if (e.target.id === 'm-img') return showLight();
+  if (e.target.id === 'm-img') return showLight(0);
   if (e.target.id === 'l-close' || e.target.id === 'light' || e.target.id === 'l-img'){ hideLight(); return; }
   const tile = e.target.closest('[data-t]');
   if (tile) return openTile(tile.dataset.t);
-  const b = e.target.closest('#m-up,#m-done,#m-del,#m-close,#m-open,#m-ret,#m-unret,#m-fix,#m-accept');
+
+  const fb = e.target.closest('[data-fo],[data-fd]');
+  if (fb){
+    const c = cell(OPEN);
+    if (fb.dataset.fo !== undefined) return showLight(+fb.dataset.fo);
+    const i = +fb.dataset.fd;
+    delFile(KEY + '|' + OPEN + '|' + i); delete ORIG[KEY + '|' + OPEN + '|' + i];
+    c.files.splice(i, 1);
+    if (!c.files.length) c.img = '';
+    saveBoard(); render(); openTile(OPEN); return;
+  }
+
+  const b = e.target.closest('#m-up,#m-done,#m-close,#m-open,#m-ret,#m-unret,#m-fix,#m-accept,#m-hide,#m-com-save,#add-tile');
   if (!b){ if (e.target.id === 'modal') closeTile(); return; }
   if (b.id === 'm-close') return closeTile();
-  if (b.id === 'm-open') return showLight();
+  if (b.id === 'add-tile') return addTile();
   const c = cell(OPEN);
 
   if (b.id === 'm-ret'){
@@ -691,39 +773,51 @@ document.addEventListener('click', e => {
     c.st = 'ret'; c.note = txt;
     saveBoard(); render(); openTile(OPEN); toast('Замечание сохранено'); return;
   }
-  if (b.id === 'm-unret'){
-    c.note = ''; if (c.st === 'ret') c.st = 'work';
-    saveBoard(); render(); openTile(OPEN); toast('Замечание снято'); return;
-  }
+  if (b.id === 'm-unret'){ c.note = ''; if (c.st === 'ret') c.st = 'work'; saveBoard(); render(); openTile(OPEN); toast('Замечание снято'); return; }
   if (b.id === 'm-accept'){ c.st = 'done'; c.note = ''; saveBoard(); render(); openTile(OPEN); toast('Лист принят'); return; }
+  if (b.id === 'm-hide'){ c.hidden = !c.hidden; saveBoard(); render(); openTile(OPEN); toast(c.hidden ? 'Лист скрыт у специалиста' : 'Лист снова виден'); return; }
   if (b.id === 'm-fix'){ c.st = 'fix'; saveBoard(); render(); openTile(OPEN); toast('Менеджер увидит, что изменения внесены'); return; }
+  if (b.id === 'm-com-save'){ c.com = (el('m-com').value || '').trim(); saveBoard(); toast('Комментарий сохранён'); return; }
   if (b.id === 'm-done'){
     c.st = c.st === 'done' ? 'work' : 'done';
     if (c.st === 'done') c.note = '';
     saveBoard(); render(); openTile(OPEN); return;
   }
-  if (b.id === 'm-del'){
-    const fkey = KEY + '|' + OPEN;
-    delFile(fkey); delete ORIG[fkey];
-    c.file = ''; c.img = ''; saveBoard(); render(); openTile(OPEN); return;
-  }
   if (b.id === 'm-up'){
-    const inp = document.createElement('input'); inp.type = 'file';
+    const inp = document.createElement('input'); inp.type = 'file'; inp.multiple = true;
     inp.onchange = () => {
-      const f = inp.files[0]; if (!f) return;
-      const fkey = KEY + '|' + OPEN;
-      ORIG[fkey] = {url: URL.createObjectURL(f), name: f.name};
-      putFile(fkey, f);
-      shrink(f, img => {
-        c.file = f.name; c.img = img;
-        if (c.st === 'ret') c.st = 'fix';
-        saveBoard(); render(); openTile(OPEN);
-        toast(img ? 'Изображение легло на доску' : 'Файл прикреплён');
+      const list = [...inp.files]; if (!list.length) return;
+      const id = OPEN;
+      list.forEach(f => {
+        const i = c.files.length;
+        c.files.push(f.name);
+        const fkey = KEY + '|' + id + '|' + i;
+        ORIG[fkey] = {url: URL.createObjectURL(f), name: f.name};
+        putFile(fkey, f);
+        if (i === 0) shrink(f, img => { c.img = img; saveBoard(); render(); if (OPEN === id) openTile(id); });
       });
+      if (c.st === 'ret') c.st = 'fix';
+      saveBoard(); render(); openTile(id);
+      toast('Загружено файлов: ' + list.length);
     };
     inp.click();
   }
 });
+
+/* менеджер добавляет свой лист */
+function addTile(){
+  const names = BOARD.map((s, i) => (i + 1) + ' — ' + s.title.slice(0, 28)).join('; ');
+  const si = prompt('В какой раздел добавить лист? ' + names, '4');
+  if (si === null) return;
+  const n = Math.max(1, Math.min(BOARD.length, parseInt(si, 10) || 1)) - 1;
+  const num = prompt('Пункт заявки, например 4.4.15', '');
+  if (num === null) return;
+  const name = prompt('Название листа', '');
+  if (!name) return;
+  EXTRA[KEY] = (EXTRA[KEY] || []).concat([{id: 'x' + Date.now(), n: num || '—', t: name, si: n}]);
+  saveExtra(); render(); toast('Лист добавлен в раздел ' + (n + 1));
+}
+
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!el('light').hidden){ hideLight(); return; }
@@ -740,6 +834,7 @@ function applyRole(){
   fillCities();
   el('hero-city').textContent = CITY[KEY].name;
   el('role-tag').textContent = ROLE_NAME[ROLE];
+  el('add-tile').hidden = ROLE !== 'mgr';
   el('hero-sub').textContent = isSpec()
     ? 'Доска листов заявки: загрузите материал и отметьте готовность'
     : 'Доска листов заявки: прогресс по всем разделам';
